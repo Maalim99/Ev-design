@@ -1,0 +1,277 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* LAMT Brand Colors */
+  /* Primary - Orange */
+  --lamt-primary: #F5A623;
+  --lamt-primary-medium: #FBD89D;
+  --lamt-primary-light: #FEF3E2;
+
+  /* Accent - Blue */
+  --lamt-accent: #07C1FF;
+  --lamt-accent-medium: #BAEEFF;
+  --lamt-accent-light: #F2FCFF;
+
+  /* Semantic Colors */
+  --lamt-danger: #FF4507;
+  --lamt-danger-medium: #F49E8B;
+  --lamt-danger-light: #FBE0DA;
+
+  --lamt-success: #36D977;
+  --lamt-success-medium: #8BE9B1;
+  --lamt-success-light: #D4F7E2;
+
+  --lamt-warning: #FFEA30;
+  --lamt-warning-medium: #FFF27D;
+  --lamt-warning-light: #FFF8E7;
+
+  --lamt-info: #B247AE;
+  --lamt-info-medium: #E5B8E4;
+  --lamt-info-light: #FFF2FF;
+
+  /* Neutral Colors */
+  --lamt-neutral-dark: #11171E;
+  --lamt-neutral-dark-medium: #374A61;
+  --lamt-neutral-dark-light: #EDF1F5;
+  --lamt-neutral: #909AA7;
+  --lamt-neutral-medium: #C9D0D9;
+  --lamt-neutral-light: #FFFFFF;
+
+  /* Modal & Shadows */
+  --lamt-modal-backdrop: rgba(55, 74, 97, 0.4);
+  --lamt-modal-shadow: rgba(55, 74, 97, 0.2);
+  --lamt-modal-shadow-light: rgba(55, 74, 97, 0.1);
+
+  /* Mapped to shadcn variables */
+  --radius: 0.625rem;
+  --background: #FFFFFF;
+  --foreground: #11171E;
+  --card: #FFFFFF;
+  --card-foreground: #11171E;
+  --popover: #FFFFFF;
+  --popover-foreground: #11171E;
+  --primary: #F5A623;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EDF1F5;
+  --secondary-foreground: #11171E;
+  --muted: #EDF1F5;
+  --muted-foreground: #909AA7;
+  --accent: #07C1FF;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF4507;
+  --destructive-foreground: #FFFFFF;
+  --border: #C9D0D9;
+  --input: #C9D0D9;
+  --ring: #F5A623;
+  --chart-1: #F5A623;
+  --chart-2: #07C1FF;
+  --chart-3: #36D977;
+  --chart-4: #B247AE;
+  --chart-5: #FFEA30;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #11171E;
+  --sidebar-primary: #F5A623;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EDF1F5;
+  --sidebar-accent-foreground: #11171E;
+  --sidebar-border: #C9D0D9;
+  --sidebar-ring: #F5A623;
+}
+
+.dark {
+  --background: #11171E;
+  --foreground: #FFFFFF;
+  --card: #374A61;
+  --card-foreground: #FFFFFF;
+  --popover: #374A61;
+  --popover-foreground: #FFFFFF;
+  --primary: #F5A623;
+  --primary-foreground: #FFFFFF;
+  --secondary: #374A61;
+  --secondary-foreground: #FFFFFF;
+  --muted: #374A61;
+  --muted-foreground: #C9D0D9;
+  --accent: #07C1FF;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF4507;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #F5A623;
+  --chart-1: #F5A623;
+  --chart-2: #07C1FF;
+  --chart-3: #36D977;
+  --chart-4: #B247AE;
+  --chart-5: #FFEA30;
+  --sidebar: #11171E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #F5A623;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #374A61;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #F5A623;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: Ubuntu, sans-serif;
+    font-size: 16px;
+    zoom: 1.15;
+  }
+
+  /* LAMT Typography Scale */
+  h1 {
+    font-size: 34.84px;
+    line-height: 56px;
+  }
+  h2 {
+    font-size: 30.6px;
+    line-height: 48px;
+  }
+  h3 {
+    font-size: 28.68px;
+    line-height: 40px;
+  }
+  h4 {
+    font-size: 26.88px;
+    line-height: 40px;
+  }
+  h5 {
+    font-size: 23.61px;
+    line-height: 32px;
+  }
+  h6 {
+    font-size: 16px;
+    line-height: 21px;
+  }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
+}
+
+@layer utilities {
+  /* LAMT Text Utilities */
+  .text-lamt {
+    font-size: 14px;
+    line-height: 24px;
+  }
+  .text-lamt-small {
+    font-size: 13.17px;
+    line-height: 16px;
+  }
+  .caption-lamt {
+    font-size: 13.17px;
+    line-height: 16px;
+  }
+  .caption-lamt-small {
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  /* LAMT Color Utilities */
+  .bg-lamt-primary {
+    background-color: var(--lamt-primary);
+  }
+  .bg-lamt-primary-medium {
+    background-color: var(--lamt-primary-medium);
+  }
+  .bg-lamt-primary-light {
+    background-color: var(--lamt-primary-light);
+  }
+  .text-lamt-primary {
+    color: var(--lamt-primary);
+  }
+
+  .bg-lamt-accent {
+    background-color: var(--lamt-accent);
+  }
+  .text-lamt-accent {
+    color: var(--lamt-accent);
+  }
+
+  .bg-lamt-danger {
+    background-color: var(--lamt-danger);
+  }
+  .text-lamt-danger {
+    color: var(--lamt-danger);
+  }
+
+  .bg-lamt-success {
+    background-color: var(--lamt-success);
+  }
+  .text-lamt-success {
+    color: var(--lamt-success);
+  }
+
+  .bg-lamt-warning {
+    background-color: var(--lamt-warning);
+  }
+  .text-lamt-warning {
+    color: var(--lamt-warning);
+  }
+
+  .bg-lamt-info {
+    background-color: var(--lamt-info);
+  }
+  .text-lamt-info {
+    color: var(--lamt-info);
+  }
+
+  .bg-lamt-neutral-dark {
+    background-color: var(--lamt-neutral-dark);
+  }
+  .text-lamt-neutral-dark {
+    color: var(--lamt-neutral-dark);
+  }
+}
