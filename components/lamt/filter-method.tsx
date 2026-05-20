@@ -160,6 +160,7 @@ export const FilterMethod = React.forwardRef<HTMLDivElement, FilterMethodProps>(
                         name={`${name}.value`}
                         date={value.split(DATE_RANGE_STRING_DELIMITER)[0]}
                         onSelect={(date) => {
+                          if (!date) return;
                           const valueArray = value.split(
                             DATE_RANGE_STRING_DELIMITER
                           );
@@ -184,6 +185,7 @@ export const FilterMethod = React.forwardRef<HTMLDivElement, FilterMethodProps>(
                             : undefined
                         }
                         onSelect={(date) => {
+                          if (!date) return;
                           const valueArray = value.split(
                             DATE_RANGE_STRING_DELIMITER
                           );
@@ -203,6 +205,7 @@ export const FilterMethod = React.forwardRef<HTMLDivElement, FilterMethodProps>(
                     name={`${name}.value`}
                     date={value.split(DATE_RANGE_STRING_DELIMITER)[0]}
                     onSelect={(date) => {
+                      if (!date) return;
                       onChange(date.toISOString());
                       onChangeFilter({
                         [name]: formControl.getValues()[name],

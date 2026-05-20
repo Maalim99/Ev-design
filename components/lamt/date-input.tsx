@@ -14,7 +14,7 @@ export interface DateInputProps {
   placeholder?: string;
   date?: Date | string | null;
   onChange?: (date: Date | [Date | null, Date | null] | null) => void;
-  onSelect?: (date: Date) => void;
+  onSelect?: (date: Date | null) => void;
   disabled?: boolean;
   minDate?: Date;
   className?: string;
@@ -52,7 +52,7 @@ export const DateInput = React.forwardRef<DatePicker, DateInputProps>(
           dateFormat="dd/MM/yyyy"
           selected={date}
           onSelect={onSelect}
-          onChange={(date) => {
+          onChange={(date: Date | [Date | null, Date | null] | null) => {
             if (onChange) {
               onChange(date as Date | [Date | null, Date | null] | null);
             }
