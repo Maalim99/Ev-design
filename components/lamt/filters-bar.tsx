@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Filter, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button, ButtonKind } from "./button";
+import { Button, ButtonKind, ButtonSize } from "./button";
 
 /**
  * LAMT FiltersBar Component
@@ -45,18 +45,18 @@ export const FiltersBar = React.forwardRef<HTMLDivElement, FiltersBarProps>(
         {leftActions &&
           leftActions.map((action, idx) => <span key={idx}>{action}</span>)}
 
-        <Button kind={ButtonKind.Ghost} onClick={onClickFilter}>
-          <Filter className="mr-2 h-4 w-4" />
+        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClickFilter}>
+          <Filter className="mr-2 h-3 w-3" />
           Filter ({activeFiltersCount})
         </Button>
 
-        <Button kind={ButtonKind.Ghost} onClick={onClickPreferences}>
-          <Settings className="mr-2 h-4 w-4" />
+        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClickPreferences}>
+          <Settings className="mr-2 h-3 w-3" />
           Preferences
         </Button>
 
         {onClearFilter && (
-          <Button kind={ButtonKind.Primary} onClick={onClearFilter} className="min-w-40">
+          <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={onClearFilter} className="min-w-40">
             Clear Filter
           </Button>
         )}

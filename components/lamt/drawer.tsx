@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
@@ -31,7 +32,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
               <SheetTitle>{title}</SheetTitle>
             </SheetHeader>
           )}
-          <div className={title ? "mt-4" : ""}>{children}</div>
+          <div className={cn("flex-1 min-h-0 overflow-y-auto", title ? "mt-4" : "")}>{children}</div>
         </SheetContent>
       </Sheet>
     );

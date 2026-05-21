@@ -1,19 +1,50 @@
 "use client";
 
 import * as React from "react";
+import { useForm } from "react-hook-form";
 import { CreditCard, TrendingUp, Users, Eye, CheckCircle2, Clock, XCircle, Zap } from "lucide-react";
+
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoFiltersDrawer } from "@/components/evcore/filters/EvoFiltersDrawer";
+import { EvoPaymentFiltersDrawer } from "@/components/evcore/filters/EvoPaymentFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
-import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
+import { FilterMethod } from "@/components/lamt/filter-method";
 import { Modal } from "@/components/lamt/modal";
-import { ButtonKind } from "@/components/lamt/button";
+import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
+import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
+import { FilterType, Method } from "@/lib/filter-utils";
+
 import { PAYMENT_RECORDS, type PaymentRecord, type PaymentChannel, type PaymentType, type PaymentStatus } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
-import { PAYMENTS_FILTER_SECTIONS, PAYMENTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { PAYMENTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import {
+  EVO_PAYMENT_FILTER_SECTIONS,
+  getPaymentFilterDefaults,
+} from "@/lib/evcore/evoPaymentFilterSections";
+
+// ─── Filter logic ─────────────────────────────────────────────────────────────
+
+function applyFilterMethod(
+  fieldValue: string | number | null | undefined,
+  method: string,
+  filterValue: string,
+): boolean {
+  if (!filterValue) return true;
+  const fv   = String(fieldValue ?? "").toLowerCase();
+  const fval = filterValue.toLowerCase();
+  switch (method) {
+    case Method.Contains:           return fv.includes(fval);
+    case Method.DoesNotContain:     return !fv.includes(fval);
+    case Method.Equals:             return fv === fval;
+    case Method.GreaterThan:        return fv >= fval;
+    case Method.LessThan:           return fv <= fval;
+    case Method.GreaterOrEqualThan: return fv >= fval;
+    case Method.LessOrEqualThan:    return fv <= fval;
+    default:                        return true;
+  }
+}
 
 // ─── Chip styles ───────────────────────────────────────────────────────────────
 
@@ -34,8 +65,6 @@ const STATUS_STYLE: Record<PaymentStatus, { label: string; bg: string; text: str
   FAILED:    { label: "Failed",    bg: "#FEE2E2", text: "#991B1B", icon: <XCircle size={10} /> },
 };
 
-// ─── Chips ─────────────────────────────────────────────────────────────────────
-
 function Chip({ bg, text, label, icon }: { bg: string; text: string; label: string; icon?: React.ReactNode }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 22, padding: "0 9px", borderRadius: 99, backgroundColor: bg, color: text, fontSize: 11, fontWeight: 600 }}>
@@ -44,11 +73,51 @@ function Chip({ bg, text, label, icon }: { bg: string; text: string; label: stri
   );
 }
 
+// ─── Shortcut filter popover button ──────────────────────────────────────────
+
+function ShortcutFilterButton({ label, isActive, children }: { label: string; isActive: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
+      <Button
+        kind={ButtonKind.Ghost}
+        size={ButtonSize.Small}
+        dashed={true}
+        badgeColor="success"
+        badgeSize="xs"
+        badge={isActive ? " " : undefined}
+        onClick={() => setOpen(p => !p)}
+      >
+        {label}
+      </Button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 200,
+          backgroundColor: "#fff", border: `0.5px solid ${EVCORE_COLORS.border}`,
+          borderRadius: 10, padding: "20px 0 12px", boxShadow: "0 5px 30px rgba(0,0,0,0.1)", minWidth: 280,
+        }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Payment Detail Modal ──────────────────────────────────────────────────────
 
 function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | null; onClose: () => void }) {
   if (!payment) return null;
-
   const ch = CHANNEL_STYLE[payment.paymentChannel];
   const ty = TYPE_STYLE[payment.paymentType];
   const st = STATUS_STYLE[payment.status];
@@ -63,7 +132,6 @@ function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | nul
 
   return (
     <Modal opened title="Payment Details" maxWidth={520} onClose={onClose}>
-      {/* EVO banner */}
       <div style={{ padding: "12px 16px", borderRadius: 10, backgroundColor: EVCORE_COLORS.pageBg, marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: EVCORE_COLORS.textPrimary }}>{payment.evoName}</div>
@@ -74,8 +142,6 @@ function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | nul
           <Chip {...st} />
         </div>
       </div>
-
-      {/* Detail rows */}
       <div style={{ marginBottom: 20 }}>
         <Row label="Payment Reference"  value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{payment.paymentReference}</span>} />
         <Row label="Channel Reference"  value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{payment.channelReference}</span>} />
@@ -92,12 +158,8 @@ function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | nul
           }
         />
       </div>
-
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button
-          onClick={onClose}
-          style={{ height: 38, padding: "0 20px", border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, backgroundColor: "transparent", fontSize: 13, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-        >
+        <button onClick={onClose} style={{ height: 38, padding: "0 20px", border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, backgroundColor: "transparent", fontSize: 13, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>
           Close
         </button>
       </div>
@@ -105,55 +167,173 @@ function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | nul
   );
 }
 
+// ─── Upload Payments Modal ────────────────────────────────────────────────────
+
+function UploadPaymentsModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+  const [dragging, setDragging] = React.useState(false);
+  if (!opened) return null;
+  return (
+    <Modal opened title="Upload Payments" maxWidth={500} onClose={onClose}>
+      <p style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary, marginBottom: 20 }}>
+        Upload a CSV file containing payment records. Each row must include EVO Code, Payment Channel, Amount (USD), and Payment Date.
+      </p>
+      <div
+        onDragOver={e => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={e => { e.preventDefault(); setDragging(false); }}
+        style={{
+          border: `2px dashed ${dragging ? EVCORE_COLORS.green : EVCORE_COLORS.border}`,
+          borderRadius: 10, padding: "36px 24px", textAlign: "center",
+          backgroundColor: dragging ? EVCORE_COLORS.greenLight : EVCORE_COLORS.pageBg,
+          transition: "all 0.2s", marginBottom: 20, cursor: "pointer",
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 600, color: EVCORE_COLORS.textPrimary, marginBottom: 6 }}>Drag & drop CSV here</div>
+        <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginBottom: 14 }}>or click to browse</div>
+        <input type="file" accept=".csv" style={{ display: "none" }} id="payment-csv-upload" />
+        <label htmlFor="payment-csv-upload">
+          <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={() => {}}>Browse file</Button>
+        </label>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClose}>Cancel</Button>
+        <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={onClose}>Upload</Button>
+      </div>
+    </Modal>
+  );
+}
+
+// ─── Download Modal ───────────────────────────────────────────────────────────
+
+function DownloadModal({ opened, onClose, columns }: { opened: boolean; onClose: () => void; columns: ColumnPref[] }) {
+  const [fmt, setFmt] = React.useState<"csv" | "xlsx">("csv");
+  if (!opened) return null;
+  return (
+    <Modal opened title="Download Payments" maxWidth={420} onClose={onClose}>
+      <p style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary, marginBottom: 16 }}>
+        Export visible payment records with currently active filters applied.
+      </p>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, marginBottom: 8 }}>FORMAT</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          {(["csv", "xlsx"] as const).map(f => (
+            <button key={f} onClick={() => setFmt(f)} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${fmt === f ? EVCORE_COLORS.green : EVCORE_COLORS.border}`, backgroundColor: fmt === f ? EVCORE_COLORS.greenLight : "transparent", fontSize: 12, fontWeight: 600, color: fmt === f ? EVCORE_COLORS.green : EVCORE_COLORS.textSecondary, cursor: "pointer" }}>
+              .{f.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, marginBottom: 8 }}>COLUMNS</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {columns.filter(c => c.visible).map(c => (
+            <span key={c.key} style={{ display: "inline-flex", alignItems: "center", height: 24, padding: "0 10px", borderRadius: 99, backgroundColor: EVCORE_COLORS.greenLight, color: EVCORE_COLORS.green, fontSize: 11, fontWeight: 600 }}>{c.label}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClose}>Cancel</Button>
+        <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={onClose}>Download</Button>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default function PaymentsPage() {
-  const [filterValues, setFilterValues] = React.useState<Record<string, string[]>>({});
-  const [columns,      setColumns]      = React.useState<ColumnPref[]>(PAYMENTS_DEFAULT_COLUMNS);
-  const [filtersOpen,  setFiltersOpen]  = React.useState(false);
-  const [prefsOpen,    setPrefsOpen]    = React.useState(false);
-  const [page,         setPage]         = React.useState(1);
-  const [detailPayment, setDetailPayment] = React.useState<PaymentRecord | null>(null);
-  const LIMIT = 10;
+const LIMIT = 10;
 
-  const currentMonth = "2026-05";
+export default function PaymentsPage() {
+  const formMethods = useForm({ defaultValues: getPaymentFilterDefaults() });
+  const [filterData, setFilterData] = React.useState<Record<string, { method: string; value: string }>>(getPaymentFilterDefaults());
+
+  const [columns,       setColumns]       = React.useState<ColumnPref[]>(PAYMENTS_DEFAULT_COLUMNS);
+  const [filtersOpen,   setFiltersOpen]   = React.useState(false);
+  const [prefsOpen,     setPrefsOpen]     = React.useState(false);
+  const [uploadOpen,    setUploadOpen]    = React.useState(false);
+  const [downloadOpen,  setDownloadOpen]  = React.useState(false);
+  const [page,          setPage]          = React.useState(1);
+  const [detailPayment, setDetailPayment] = React.useState<PaymentRecord | null>(null);
+
+  const onChangeFilter = React.useCallback((values: Record<string, unknown>) => {
+    setFilterData(prev => ({ ...prev, ...(values as Record<string, { method: string; value: string }>) }));
+    setPage(1);
+  }, []);
+
+  const onResetAllFilters = React.useCallback(() => {
+    const defaults = getPaymentFilterDefaults();
+    formMethods.reset(defaults);
+    setFilterData(defaults);
+    setPage(1);
+  }, [formMethods]);
+
+  // ── KPI calculations ─────────────────────────────────────────────────────────
+  const currentMonth    = "2026-05";
   const mtdRecords      = PAYMENT_RECORDS.filter(p => p.paymentDatetime.startsWith(currentMonth));
   const totalMtd        = mtdRecords.reduce((s, p) => s + p.amount, 0);
   const rentalMtd       = mtdRecords.filter(p => p.paymentType === "RENTAL").reduce((s, p) => s + p.amount, 0);
   const subscriptionMtd = mtdRecords.filter(p => p.paymentType === "SUBSCRIPTION").reduce((s, p) => s + p.amount, 0);
   const uniquePayingEvos = new Set(PAYMENT_RECORDS.filter(p => p.paymentType === "RENTAL").map(p => p.evoCode)).size;
 
+  // ── Filtered data ────────────────────────────────────────────────────────────
   const filtered = React.useMemo(() => {
-    const channels = filterValues.paymentChannel ?? [];
-    const types    = filterValues.paymentType    ?? [];
-    const statuses = filterValues.status         ?? [];
-    const emcs     = filterValues.emc            ?? [];
-    return PAYMENT_RECORDS.filter(p =>
-      (!channels.length || channels.includes(p.paymentChannel as string)) &&
-      (!types.length    || types.includes(p.paymentType as string)) &&
-      (!statuses.length || statuses.includes(p.status as string)) &&
-      (!emcs.length     || emcs.includes(p.emcName))
-    ).sort((a, b) => b.paymentDatetime.localeCompare(a.paymentDatetime));
-  }, [filterValues]);
+    return PAYMENT_RECORDS.filter(p => {
+      const fields: Record<string, string | number> = {
+        paymentReference: p.paymentReference,
+        evoCode:          p.evoCode,
+        evoName:          p.evoName,
+        paymentDatetime:  p.paymentDatetime,
+        amount:           p.amount,
+        paymentChannel:   p.paymentChannel,
+        paymentType:      p.paymentType,
+        status:           p.status,
+        emcName:          p.emcName,
+      };
+      return Object.entries(filterData).every(([key, { method, value }]) =>
+        applyFilterMethod(fields[key], method, value)
+      );
+    }).sort((a, b) => b.paymentDatetime.localeCompare(a.paymentDatetime));
+  }, [filterData]);
 
-  const activeFiltersCount = Object.values(filterValues).reduce((a, v) => a + v.length, 0);
-  const handleFilterChange = (id: string, selected: string[]) => { setFilterValues(p => ({ ...p, [id]: selected })); setPage(1); };
-  const handleFilterReset  = () => { setFilterValues({}); setPage(1); };
+  const activeFiltersCount = Object.values(filterData).filter(f => f.value !== "").length;
   const handleColumnReset  = () => setColumns(PAYMENTS_DEFAULT_COLUMNS);
+
+  // ── Shortcut active check ────────────────────────────────────────────────────
+  const isPaymentRefActive = !!filterData.paymentReference?.value;
+
+  // ── Left actions ─────────────────────────────────────────────────────────────
+  const leftActions = [
+    <ShortcutFilterButton key="payref" label="Payment Reference" isActive={isPaymentRefActive}>
+      <FilterMethod
+        name="paymentReference"
+        type={FilterType.Str}
+        method={Method.Contains}
+        formControl={formMethods}
+        onChangeFilter={onChangeFilter}
+      />
+    </ShortcutFilterButton>,
+  ];
+
+  // ── Table ────────────────────────────────────────────────────────────────────
+  const visibleKeys = new Set(columns.filter(c => c.visible).map(c => c.key));
+
+  const allRows: Record<string, (p: PaymentRecord) => React.ReactNode> = {
+    evoCode:    p => <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.green }}>{p.evoCode}</span>,
+    evoName:    p => <span style={{ fontSize: 13, fontWeight: 600, color: EVCORE_COLORS.textPrimary }}>{p.evoName}</span>,
+    emc:        p => <span style={{ fontSize: 12 }}>{p.emcName}</span>,
+    type:       p => <Chip {...TYPE_STYLE[p.paymentType]} />,
+    amount:     p => <span style={{ fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.textPrimary, fontFamily: "monospace" }}>{p.currency} {p.amount}.00</span>,
+    channel:    p => <Chip {...CHANNEL_STYLE[p.paymentChannel]} />,
+    status:     p => <Chip {...STATUS_STYLE[p.status]} />,
+    activation: p => p.activationCodeGenerated
+      ? <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, color: "#0F6E56", fontWeight: 600 }}><Zap size={11} />Yes</span>
+      : <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>—</span>,
+    date:       p => <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{new Date(p.paymentDatetime).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>,
+  };
 
   const tableData = filtered.map(p => ({
     id: p.id,
-    evoCode:   <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.green }}>{p.evoCode}</span>,
-    evoName:   <span style={{ fontSize: 13, fontWeight: 600, color: EVCORE_COLORS.textPrimary }}>{p.evoName}</span>,
-    emc:       <span style={{ fontSize: 12 }}>{p.emcName}</span>,
-    type:      <Chip {...TYPE_STYLE[p.paymentType]} />,
-    amount:    <span style={{ fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.textPrimary, fontFamily: "monospace" }}>{p.currency} {p.amount}.00</span>,
-    channel:   <Chip {...CHANNEL_STYLE[p.paymentChannel]} />,
-    status:    <Chip {...STATUS_STYLE[p.status]} />,
-    activation: p.activationCodeGenerated
-      ? <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, color: "#0F6E56", fontWeight: 600 }}><Zap size={11} />Yes</span>
-      : <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>—</span>,
-    date:      <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{new Date(p.paymentDatetime).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>,
+    ...Object.fromEntries(Object.entries(allRows).filter(([k]) => visibleKeys.has(k)).map(([k, fn]) => [k, fn(p)])),
     _raw: p,
   }));
 
@@ -178,7 +358,13 @@ export default function PaymentsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
           <div>
-            <PageHeader title="Payment Records" actions={[{ label: "+ Record Payment", kind: ButtonKind.Primary, onClick: () => {} }]} />
+            <PageHeader
+              title="Payment Records"
+              actions={[
+                { label: "Upload Payments", kind: ButtonKind.Ghost, onClick: () => setUploadOpen(true) },
+              ]}
+              onClickDownload={() => setDownloadOpen(true)}
+            />
             <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginTop: 4 }}>
               {filtered.length} {filtered.length === 1 ? "record" : "records"}{activeFiltersCount > 0 ? " matching filters" : " total"} · M-Pesa · Airtel Money · Orange Money
             </div>
@@ -192,17 +378,18 @@ export default function PaymentsPage() {
           </div>
 
           <FiltersBar
+            leftActions={leftActions}
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={activeFiltersCount > 0 ? handleFilterReset : undefined}
+            onClearFilter={activeFiltersCount > 0 ? onResetAllFilters : undefined}
           />
 
           {filtered.length === 0 ? (
             <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, padding: "48px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: EVCORE_COLORS.textPrimary, marginBottom: 8 }}>No payments found</div>
               <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginBottom: 16 }}>No records match your current filters.</div>
-              <button onClick={handleFilterReset} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 12, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Clear filters</button>
+              <button onClick={onResetAllFilters} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 12, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Clear filters</button>
             </div>
           ) : (
             <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, overflow: "hidden" }}>
@@ -214,13 +401,21 @@ export default function PaymentsPage() {
         </div>
       </AppShell>
 
+      {/* Modals */}
       <PaymentDetailModal payment={detailPayment} onClose={() => setDetailPayment(null)} />
+      <UploadPaymentsModal opened={uploadOpen}   onClose={() => setUploadOpen(false)} />
+      <DownloadModal       opened={downloadOpen} onClose={() => setDownloadOpen(false)} columns={columns} />
 
-      <EvoFiltersDrawer
-        opened={filtersOpen} onClose={() => setFiltersOpen(false)}
-        sections={PAYMENTS_FILTER_SECTIONS} values={filterValues}
-        onChange={handleFilterChange} onReset={handleFilterReset}
+      {/* Filter drawer */}
+      <EvoPaymentFiltersDrawer
+        opened={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        formControl={formMethods}
+        onChangeFilter={onChangeFilter}
+        onResetAll={onResetAllFilters}
       />
+
+      {/* Preferences drawer */}
       <EvoPreferencesDrawer
         opened={prefsOpen} onClose={() => setPrefsOpen(false)}
         columns={columns} onChange={(k, v) => setColumns(p => p.map(c => c.key === k ? { ...c, visible: v } : c))}

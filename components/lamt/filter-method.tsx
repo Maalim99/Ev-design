@@ -8,7 +8,8 @@ import { Button, ButtonKind } from "./button";
 import { TextInput } from "./text-input";
 import { DateInput } from "./date-input";
 import { RadioGroup } from "./radio-group";
-import { Dropdown, DropdownOption } from "./dropdown";
+import { PaginationDropdown, SelectVariant } from "./pagination-dropdown";
+import type { DropdownOption } from "./dropdown";
 import {
   DATE_RANGE_STRING_DELIMITER,
   FilterType,
@@ -137,13 +138,16 @@ export const FilterMethod = React.forwardRef<HTMLDivElement, FilterMethodProps>(
               }
 
               if (type === FilterType.Select) {
-                const currentOption = (options || []).find(opt => opt.id === value);
+                const selectOptions = (options || []).map(opt => ({ label: opt.name, value: opt.id }));
                 return (
-                  <Dropdown
-                    label={currentOption?.name || placeholder || "Select"}
-                    options={options || []}
+                  <PaginationDropdown
+                    variant={SelectVariant.FORM}
+                    hideClearButton
+                    placeholder={placeholder || "Select"}
+                    value={value}
+                    options={selectOptions}
                     onClickOption={(option) => {
-                      onChange(option.id);
+                      onChange(String(option.value));
                       onChangeFilter({
                         [name]: formControl.getValues()[name],
                       });

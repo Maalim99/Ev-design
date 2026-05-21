@@ -1,22 +1,28 @@
 "use client";
 
 import * as React from "react";
-import { Search, X, Package, Bike, ShoppingCart, Layers, Eye, Pencil } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Package, Bike, ShoppingCart, Layers, Eye, Pencil, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoFiltersDrawer } from "@/components/evcore/filters/EvoFiltersDrawer";
+import { EvoProductsFiltersDrawer } from "@/components/evcore/filters/EvoProductsFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
+import { FilterMethod } from "@/components/lamt/filter-method";
 import { Modal } from "@/components/lamt/modal";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
 import { TextInput } from "@/components/lamt/text-input";
+import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
+import { FilterType, Method } from "@/lib/filter-utils";
 import { FLEET_ASSETS, EVO_ACCOUNTS } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
-import { PRODUCTS_FILTER_SECTIONS, PRODUCTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
-import { ButtonKind } from "@/components/lamt/button";
+import { PRODUCTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import {
+  getProductsFilterDefaults,
+} from "@/lib/evcore/evoProductsFilterSections";
 
-// ─── Reference data — BRD §6.2 ─────────────────────────────────────────────
+// ─── Reference data ───────────────────────────────────────────────────────────
 
 type EvTypeKey = "TWO_WHEELER" | "THREE_WHEELER" | "CART";
 
@@ -30,17 +36,35 @@ interface EvProduct {
 }
 
 const EV_PRODUCTS: EvProduct[] = [
-  { code: "ALTECH-EMMO-A1", type: "2W",   label: "Electric Moto",    evType: "TWO_WHEELER",   description: "Standard electric motorcycle, single-battery",       isActive: true  },
-  { code: "ALTECH-EPAT-A1", type: "2W",   label: "Electric Patrol",  evType: "TWO_WHEELER",   description: "Patrol electric motorcycle, heavy-duty frame",       isActive: true  },
-  { code: "ALTECH-F3-2B",   type: "2W",   label: "F3 Premium",       evType: "TWO_WHEELER",   description: "F3 series electric motorcycle, 2-battery pack",      isActive: true  },
-  { code: "ALTECH-E3-2B",   type: "2W",   label: "E3 Standard",      evType: "TWO_WHEELER",   description: "E3 series electric motorcycle, 2-battery pack",      isActive: true  },
-  { code: "ALTECH-T1-2B",   type: "3W",   label: "Tricycle T1",      evType: "THREE_WHEELER", description: "T1 electric tricycle, 2-battery pack",               isActive: true  },
-  { code: "ALTECH-T2-2B",   type: "3W",   label: "Tricycle T2",      evType: "THREE_WHEELER", description: "T2 electric tricycle, reinforced chassis",            isActive: true  },
-  { code: "ALTECH-T3-2B",   type: "3W",   label: "Tricycle T3",      evType: "THREE_WHEELER", description: "T3 electric tricycle, cargo-optimised",              isActive: false },
-  { code: "ALTECH-ECAT-A1", type: "Cart", label: "Electric Cart",    evType: "CART",          description: "Electric cargo cart, flatbed, single-battery",       isActive: true  },
+  { code: "ALTECH-EMMO-A1", type: "2W",   label: "Electric Moto",   evType: "TWO_WHEELER",   description: "Standard electric motorcycle, single-battery",       isActive: true  },
+  { code: "ALTECH-EPAT-A1", type: "2W",   label: "Electric Patrol", evType: "TWO_WHEELER",   description: "Patrol electric motorcycle, heavy-duty frame",       isActive: true  },
+  { code: "ALTECH-F3-2B",   type: "2W",   label: "F3 Premium",      evType: "TWO_WHEELER",   description: "F3 series electric motorcycle, 2-battery pack",      isActive: true  },
+  { code: "ALTECH-E3-2B",   type: "2W",   label: "E3 Standard",     evType: "TWO_WHEELER",   description: "E3 series electric motorcycle, 2-battery pack",      isActive: true  },
+  { code: "ALTECH-T1-2B",   type: "3W",   label: "Tricycle T1",     evType: "THREE_WHEELER", description: "T1 electric tricycle, 2-battery pack",               isActive: true  },
+  { code: "ALTECH-T2-2B",   type: "3W",   label: "Tricycle T2",     evType: "THREE_WHEELER", description: "T2 electric tricycle, reinforced chassis",            isActive: true  },
+  { code: "ALTECH-T3-2B",   type: "3W",   label: "Tricycle T3",     evType: "THREE_WHEELER", description: "T3 electric tricycle, cargo-optimised",              isActive: false },
+  { code: "ALTECH-ECAT-A1", type: "Cart", label: "Electric Cart",   evType: "CART",          description: "Electric cargo cart, flatbed, single-battery",       isActive: true  },
 ];
 
-// ─── Style maps ────────────────────────────────────────────────────────────
+// ─── Filter logic ─────────────────────────────────────────────────────────────
+
+function applyFilterMethod(
+  fieldValue: string | number | boolean | null | undefined,
+  method: string,
+  filterValue: string,
+): boolean {
+  if (!filterValue) return true;
+  const fv   = String(fieldValue ?? "").toLowerCase();
+  const fval = filterValue.toLowerCase();
+  switch (method) {
+    case Method.Contains:       return fv.includes(fval);
+    case Method.DoesNotContain: return !fv.includes(fval);
+    case Method.Equals:         return fv === fval;
+    default:                    return true;
+  }
+}
+
+// ─── Style maps ───────────────────────────────────────────────────────────────
 
 const TYPE_STYLE: Record<string, { bg: string; text: string }> = {
   "2W":   { bg: "#E1F5EE", text: "#0F6E56" },
@@ -54,7 +78,7 @@ const EVTYPE_COLOR: Record<EvTypeKey, string> = {
   CART:          EVCORE_COLORS.amber,
 };
 
-// ─── Shared sub-components ─────────────────────────────────────────────────
+// ─── Shared sub-components ────────────────────────────────────────────────────
 
 const FORM_LABEL: React.CSSProperties = {
   display: "block", fontSize: 11, fontWeight: 600,
@@ -116,7 +140,48 @@ function ProgressRow({ label, count, max, color }: { label: string; count: numbe
   );
 }
 
-// ─── Product Detail Modal ──────────────────────────────────────────────────
+// ─── Shortcut filter popover button ───────────────────────────────────────────
+
+function ShortcutFilterButton({ label, isActive, children }: { label: string; isActive: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
+      <Button
+        kind={ButtonKind.Ghost}
+        size={ButtonSize.Small}
+        dashed={true}
+        badgeColor="success"
+        badgeSize="xs"
+        badge={isActive ? " " : undefined}
+        onClick={() => setOpen(p => !p)}
+      >
+        {label}
+      </Button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 200,
+          backgroundColor: "#fff", border: `0.5px solid ${EVCORE_COLORS.border}`,
+          borderRadius: 10, padding: "20px 0 12px", boxShadow: "0 5px 30px rgba(0,0,0,0.1)", minWidth: 280,
+        }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Product Detail Modal ──────────────────────────────────────────────────────
 
 function ProductDetailModal({ product, activeAssets, totalAssets, evoCount, onClose }: {
   product: EvProduct | null; activeAssets: number; totalAssets: number; evoCount: number; onClose: () => void;
@@ -126,12 +191,12 @@ function ProductDetailModal({ product, activeAssets, totalAssets, evoCount, onCl
     <Modal opened title="Product Details" maxWidth={520} onClose={onClose}>
       <ProductBanner product={product} />
       <div style={{ marginBottom: 20 }}>
-        <DetailRow label="EV Type"          value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{product.evType}</span>} />
-        <DetailRow label="Vehicle Class"    value={product.type === "2W" ? "Two-Wheeler" : product.type === "3W" ? "Three-Wheeler" : "Cart"} />
-        <DetailRow label="Active Assets"    value={<span style={{ fontWeight: 800, color: EVCORE_COLORS.green }}>{activeAssets} on road</span>} />
-        <DetailRow label="Total Assets"     value={`${totalAssets} in fleet`} />
-        <DetailRow label="EVOs Enrolled"    value={<strong style={{ color: EVCORE_COLORS.textPrimary }}>{evoCount}</strong>} />
-        <DetailRow label="Description"      value={<span style={{ fontWeight: 400, fontSize: 12, fontStyle: "italic" }}>{product.description}</span>} />
+        <DetailRow label="EV Type"       value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{product.evType}</span>} />
+        <DetailRow label="Vehicle Class" value={product.type === "2W" ? "Two-Wheeler" : product.type === "3W" ? "Three-Wheeler" : "Cart"} />
+        <DetailRow label="Active Assets" value={<span style={{ fontWeight: 800, color: EVCORE_COLORS.green }}>{activeAssets} on road</span>} />
+        <DetailRow label="Total Assets"  value={`${totalAssets} in fleet`} />
+        <DetailRow label="EVOs Enrolled" value={<strong style={{ color: EVCORE_COLORS.textPrimary }}>{evoCount}</strong>} />
+        <DetailRow label="Description"   value={<span style={{ fontWeight: 400, fontSize: 12, fontStyle: "italic" }}>{product.description}</span>} />
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <button onClick={onClose} style={{ height: 38, padding: "0 20px", border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, backgroundColor: "transparent", fontSize: 13, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>
@@ -142,9 +207,9 @@ function ProductDetailModal({ product, activeAssets, totalAssets, evoCount, onCl
   );
 }
 
-// ─── Edit Product Modal ────────────────────────────────────────────────────
+// ─── Update Product Modal ──────────────────────────────────────────────────────
 
-function EditProductModal({ product, onClose }: { product: EvProduct | null; onClose: () => void }) {
+function UpdateProductModal({ product, onClose }: { product: EvProduct | null; onClose: () => void }) {
   const [label,       setLabel]       = React.useState(product?.label ?? "");
   const [description, setDescription] = React.useState(product?.description ?? "");
   const [isActive,    setIsActive]    = React.useState(product?.isActive ?? true);
@@ -156,7 +221,7 @@ function EditProductModal({ product, onClose }: { product: EvProduct | null; onC
   if (!product) return null;
 
   return (
-    <Modal opened title="Edit Product" maxWidth={520} onClose={onClose}>
+    <Modal opened title="Update Product" maxWidth={520} onClose={onClose}>
       <ProductBanner product={product} />
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
@@ -188,7 +253,35 @@ function EditProductModal({ product, onClose }: { product: EvProduct | null; onC
   );
 }
 
-// ─── Add Product Modal ─────────────────────────────────────────────────────
+// ─── Delete Product Modal ──────────────────────────────────────────────────────
+
+function DeleteProductModal({ product, onClose }: { product: EvProduct | null; onClose: () => void }) {
+  if (!product) return null;
+  return (
+    <Modal opened title="Delete Product" maxWidth={460} onClose={onClose}>
+      <ProductBanner product={product} />
+      <div style={{ backgroundColor: "#FEF2F2", border: `0.5px solid #FECACA`, borderRadius: 8, padding: "11px 14px", marginBottom: 20, display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <span style={{ fontSize: 16, flexShrink: 0 }}>⚠</span>
+        <div style={{ fontSize: 13, color: "#991B1B", lineHeight: 1.6 }}>
+          Deleting a product code will affect all linked <strong>EVO accounts</strong>, <strong>fleet assets</strong> and <strong>rental plans</strong> that reference <strong>{product.code}</strong>. This action cannot be undone.
+        </div>
+      </div>
+      <p style={{ fontSize: 13, color: EVCORE_COLORS.textPrimary, lineHeight: 1.7, marginBottom: 24 }}>
+        Are you sure you want to delete this product?
+      </p>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <button onClick={onClose} style={{ height: 40, padding: "0 20px", border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, backgroundColor: "transparent", fontSize: 13, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>
+          Cancel
+        </button>
+        <button onClick={onClose} style={{ height: 40, padding: "0 22px", border: "none", borderRadius: 8, backgroundColor: EVCORE_COLORS.danger, fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.white, cursor: "pointer" }}>
+          Yes, Delete
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+// ─── Create Product Modal ──────────────────────────────────────────────────────
 
 const TYPE_OPTS = [
   { value: "2W",   label: "2W — Two-Wheeler" },
@@ -201,11 +294,11 @@ const EV_TYPE_OPTS = [
   { value: "CART",          label: "CART" },
 ];
 
-function AddProductModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+function CreateProductModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
   const [isActive, setIsActive] = React.useState(true);
-
+  if (!opened) return null;
   return (
-    <Modal opened={opened} title="Add Product" maxWidth={560} onClose={onClose}>
+    <Modal opened title="Create Product" maxWidth={560} onClose={onClose}>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div><label style={FORM_LABEL}>Product Code</label><TextInput name="code" placeholder="ALTECH-XXX-XX" /></div>
@@ -241,29 +334,80 @@ function AddProductModal({ opened, onClose }: { opened: boolean; onClose: () => 
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, borderTop: `0.5px solid ${EVCORE_COLORS.border}`, marginTop: 8 }}>
           <button onClick={onClose} style={{ height: 40, padding: "0 20px", border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, backgroundColor: "transparent", fontSize: 13, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Cancel</button>
-          <button style={{ height: 40, padding: "0 22px", border: "none", borderRadius: 8, backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.white, cursor: "pointer" }}>Add Product</button>
+          <button style={{ height: 40, padding: "0 22px", border: "none", borderRadius: 8, backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.white, cursor: "pointer" }}>Create Product</button>
         </div>
       </div>
     </Modal>
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// ─── Download Modal ───────────────────────────────────────────────────────────
+
+function DownloadModal({ opened, onClose, columns }: { opened: boolean; onClose: () => void; columns: ColumnPref[] }) {
+  const [fmt, setFmt] = React.useState<"csv" | "xlsx">("csv");
+  if (!opened) return null;
+  return (
+    <Modal opened title="Download Products" maxWidth={420} onClose={onClose}>
+      <p style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary, marginBottom: 16 }}>
+        Export visible product records with currently active filters applied.
+      </p>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, marginBottom: 8 }}>FORMAT</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          {(["csv", "xlsx"] as const).map(f => (
+            <button key={f} onClick={() => setFmt(f)} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${fmt === f ? EVCORE_COLORS.green : EVCORE_COLORS.border}`, backgroundColor: fmt === f ? EVCORE_COLORS.greenLight : "transparent", fontSize: 12, fontWeight: 600, color: fmt === f ? EVCORE_COLORS.green : EVCORE_COLORS.textSecondary, cursor: "pointer" }}>
+              .{f.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, marginBottom: 8 }}>COLUMNS</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {columns.filter(c => c.visible).map(c => (
+            <span key={c.key} style={{ display: "inline-flex", alignItems: "center", height: 24, padding: "0 10px", borderRadius: 99, backgroundColor: EVCORE_COLORS.greenLight, color: EVCORE_COLORS.green, fontSize: 11, fontWeight: 600 }}>{c.label}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClose}>Cancel</Button>
+        <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={onClose}>Download</Button>
+      </div>
+    </Modal>
+  );
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
+const LIMIT = 10;
 
 export default function ProductsPage() {
-  const [filterValues, setFilterValues] = React.useState<Record<string, string[]>>({});
-  const [columns,      setColumns]      = React.useState<ColumnPref[]>(PRODUCTS_DEFAULT_COLUMNS);
-  const [filtersOpen,  setFiltersOpen]  = React.useState(false);
-  const [prefsOpen,    setPrefsOpen]    = React.useState(false);
-  const [searchQuery,  setSearchQuery]  = React.useState("");
-  const [page,         setPage]         = React.useState(1);
+  const formMethods = useForm({ defaultValues: getProductsFilterDefaults() });
+  const [filterData, setFilterData] = React.useState<Record<string, { method: string; value: string }>>(getProductsFilterDefaults());
+
+  const [columns,       setColumns]       = React.useState<ColumnPref[]>(PRODUCTS_DEFAULT_COLUMNS);
+  const [filtersOpen,   setFiltersOpen]   = React.useState(false);
+  const [prefsOpen,     setPrefsOpen]     = React.useState(false);
+  const [downloadOpen,  setDownloadOpen]  = React.useState(false);
+  const [createOpen,    setCreateOpen]    = React.useState(false);
+  const [page,          setPage]          = React.useState(1);
   const [detailProduct, setDetailProduct] = React.useState<EvProduct | null>(null);
-  const [editProduct,   setEditProduct]   = React.useState<EvProduct | null>(null);
-  const [addOpen,       setAddOpen]       = React.useState(false);
+  const [updateProduct, setUpdateProduct] = React.useState<EvProduct | null>(null);
+  const [deleteProduct, setDeleteProduct] = React.useState<EvProduct | null>(null);
 
-  const LIMIT = 10;
+  const onChangeFilter = React.useCallback((values: Record<string, unknown>) => {
+    setFilterData(prev => ({ ...prev, ...(values as Record<string, { method: string; value: string }>) }));
+    setPage(1);
+  }, []);
 
-  // Enrich with live asset counts
+  const onResetAllFilters = React.useCallback(() => {
+    const defaults = getProductsFilterDefaults();
+    formMethods.reset(defaults);
+    setFilterData(defaults);
+    setPage(1);
+  }, [formMethods]);
+
+  // ── Enrich with live asset/EVO counts ───────────────────────────────────────
   const enriched = React.useMemo(() =>
     EV_PRODUCTS.map(p => ({
       ...p,
@@ -274,26 +418,29 @@ export default function ProductsPage() {
     []
   );
 
+  // ── Filtered data ────────────────────────────────────────────────────────────
   const filtered = React.useMemo(() => {
-    const q        = searchQuery.toLowerCase();
-    const types    = filterValues.evType  ?? [];
-    const statuses = filterValues.status  ?? [];
     return enriched.filter(p => {
-      const matchSearch = !q || p.code.toLowerCase().includes(q) || p.label.toLowerCase().includes(q) || p.evType.toLowerCase().includes(q);
-      const matchType   = !types.length    || types.includes(p.evType);
-      const matchStatus = !statuses.length || statuses.some(s => s === "ACTIVE" ? p.isActive : !p.isActive);
-      return matchSearch && matchType && matchStatus;
+      const statusValue = p.isActive ? "ACTIVE" : "INACTIVE";
+      const fields: Record<string, string> = {
+        code:   p.code,
+        label:  p.label,
+        evType: p.evType,
+        status: statusValue,
+      };
+      return Object.entries(filterData).every(([key, { method, value }]) =>
+        applyFilterMethod(fields[key], method, value)
+      );
     });
-  }, [enriched, searchQuery, filterValues]);
+  }, [enriched, filterData]);
 
-  const activeFiltersCount = Object.values(filterValues).reduce((a, v) => a + v.length, 0);
-  const hasFilters = !!(searchQuery || activeFiltersCount);
-
-  const handleFilterChange = (id: string, selected: string[]) => { setFilterValues(prev => ({ ...prev, [id]: selected })); setPage(1); };
-  const handleFilterReset  = () => { setFilterValues({}); setSearchQuery(""); setPage(1); };
+  const activeFiltersCount = Object.values(filterData).filter(f => f.value !== "").length;
   const handleColumnReset  = () => setColumns(PRODUCTS_DEFAULT_COLUMNS);
 
-  // Stats
+  // ── Shortcut active check ────────────────────────────────────────────────────
+  const isProductCodeActive = !!filterData.code?.value;
+
+  // ── KPI calculations ─────────────────────────────────────────────────────────
   const totalActiveAssets = enriched.reduce((s, p) => s + p.activeAssets, 0);
   const byType = {
     TWO_WHEELER:   enriched.filter(p => p.evType === "TWO_WHEELER").reduce((s, p)   => s + p.activeAssets, 0),
@@ -301,10 +448,24 @@ export default function ProductsPage() {
     CART:          enriched.filter(p => p.evType === "CART").reduce((s, p)           => s + p.activeAssets, 0),
   };
 
-  // Column visibility
+  // ── Left actions (shortcut filter buttons) ──────────────────────────────────
+  const leftActions = [
+    <ShortcutFilterButton key="code" label="Product Code" isActive={isProductCodeActive}>
+      <FilterMethod
+        name="code"
+        type={FilterType.Str}
+        method={Method.Contains}
+        formControl={formMethods}
+        onChangeFilter={onChangeFilter}
+      />
+    </ShortcutFilterButton>,
+  ];
+
+  // ── Table ────────────────────────────────────────────────────────────────────
+  type Enriched = typeof enriched[0];
+
   const visibleKeys = new Set(columns.filter(c => c.visible).map(c => c.key));
 
-  type Enriched = typeof enriched[0];
   const allCols: Record<string, (p: Enriched) => React.ReactNode> = {
     code:         p => <span style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: EVCORE_COLORS.green, backgroundColor: "#EBF8F3", border: `0.5px solid ${EVCORE_COLORS.greenLight}`, borderRadius: 5, padding: "3px 8px", display: "inline-block" }}>{p.code}</span>,
     type:         p => <TypeChip type={p.type} />,
@@ -327,7 +488,7 @@ export default function ProductsPage() {
   const rowActions = (row: Record<string, number | string | React.ReactNode | object>) => {
     const p = row._raw as Enriched;
     return (
-      <div style={{ display: "flex", gap: 6 }}>
+      <div style={{ display: "flex", gap: 4 }}>
         <button
           onClick={() => setDetailProduct(p)}
           style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
@@ -335,10 +496,16 @@ export default function ProductsPage() {
           <Eye size={10} /> View
         </button>
         <button
-          onClick={() => setEditProduct(p)}
+          onClick={() => setUpdateProduct(p)}
           style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
         >
-          <Pencil size={10} /> Edit
+          <Pencil size={10} /> Update
+        </button>
+        <button
+          onClick={() => setDeleteProduct(p)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid #FECACA`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.danger, cursor: "pointer" }}
+        >
+          <Trash2 size={10} /> Delete
         </button>
       </div>
     );
@@ -351,62 +518,43 @@ export default function ProductsPage() {
       <AppShell pageTitle="Products">
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* ── Info bar ─────────────────────────────────────────────────── */}
           <div style={{ backgroundColor: "#EFF6FF", borderLeft: "3px solid #3B82F6", borderRadius: "0 8px 8px 0", padding: "12px 16px", fontSize: 13, color: "#1E40AF", lineHeight: 1.6 }}>
             Product codes are reference data used by EVO accounts, EV assets and rental plans.{" "}
             <strong>Changes affect all linked records.</strong>
           </div>
 
-          {/* ── Header ───────────────────────────────────────────────────── */}
           <div>
             <PageHeader
               title="Products"
-              actions={[{ label: "+ Add Product", kind: ButtonKind.Primary, onClick: () => setAddOpen(true) }]}
+              actions={[{ label: "+ Create Product", kind: ButtonKind.Primary, onClick: () => setCreateOpen(true) }]}
+              onClickDownload={() => setDownloadOpen(true)}
             />
             <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginTop: 2 }}>
-              EV product code reference data · BRD §6.2
-              {hasFilters ? ` · ${filtered.length} of ${EV_PRODUCTS.length} shown` : ` · ${EV_PRODUCTS.length} products`}
+              EV product code reference data
+              {activeFiltersCount > 0 ? ` · ${filtered.length} of ${EV_PRODUCTS.length} shown` : ` · ${EV_PRODUCTS.length} products`}
             </div>
           </div>
 
-          {/* ── KPI row ──────────────────────────────────────────────────── */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-            <KpiCard label="Total Products"  value={String(EV_PRODUCTS.length)}                                       delta="All product codes"        deltaType="neutral"  icon={Package} />
-            <KpiCard label="Two-Wheelers"    value={String(enriched.filter(p => p.evType === "TWO_WHEELER").length)}   delta="Moto & scooter variants"  deltaType="neutral"  icon={Bike} />
-            <KpiCard label="Three-Wheelers"  value={String(enriched.filter(p => p.evType === "THREE_WHEELER").length)} delta="Tricycle variants"         deltaType="neutral"  icon={Layers} />
-            <KpiCard label="Active Assets"   value={String(totalActiveAssets)}                                        delta="Currently on road"         deltaType="positive" icon={ShoppingCart} />
+            <KpiCard label="Total Products" value={String(EV_PRODUCTS.length)}                                       delta="All product codes"       deltaType="neutral"  icon={Package} />
+            <KpiCard label="Two-Wheelers"   value={String(enriched.filter(p => p.evType === "TWO_WHEELER").length)}   delta="Moto & scooter variants" deltaType="neutral"  icon={Bike} />
+            <KpiCard label="Three-Wheelers" value={String(enriched.filter(p => p.evType === "THREE_WHEELER").length)} delta="Tricycle variants"        deltaType="neutral"  icon={Layers} />
+            <KpiCard label="Active Assets"  value={String(totalActiveAssets)}                                        delta="Currently on road"        deltaType="positive" icon={ShoppingCart} />
           </div>
 
-          {/* ── Search ───────────────────────────────────────────────────── */}
-          <div style={{ position: "relative" }}>
-            <Search size={14} color={EVCORE_COLORS.textSecondary} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
-            <input
-              value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
-              placeholder="Search product code or label…"
-              style={{ width: "100%", height: 38, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 8, paddingLeft: 36, paddingRight: searchQuery ? 36 : 12, fontSize: 13, color: EVCORE_COLORS.textPrimary, backgroundColor: EVCORE_COLORS.white, outline: "none", boxSizing: "border-box" }}
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", padding: 2 }}>
-                <X size={13} color={EVCORE_COLORS.textSecondary} />
-              </button>
-            )}
-          </div>
-
-          {/* ── Filters bar ──────────────────────────────────────────────── */}
           <FiltersBar
+            leftActions={leftActions}
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={hasFilters ? handleFilterReset : undefined}
+            onClearFilter={activeFiltersCount > 0 ? onResetAllFilters : undefined}
           />
 
-          {/* ── Table ────────────────────────────────────────────────────── */}
           {filtered.length === 0 ? (
             <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, padding: "48px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: EVCORE_COLORS.textPrimary, marginBottom: 8 }}>No products found</div>
               <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginBottom: 16 }}>No products match your current filters.</div>
-              <button onClick={handleFilterReset} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 12, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Clear filters</button>
+              <button onClick={onResetAllFilters} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 12, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Clear filters</button>
             </div>
           ) : (
             <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, overflow: "hidden" }}>
@@ -425,7 +573,6 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {/* ── Summary cards ────────────────────────────────────────────── */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, padding: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: EVCORE_COLORS.textPrimary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>Active assets by EV type</div>
@@ -447,7 +594,6 @@ export default function ProductsPage() {
         </div>
       </AppShell>
 
-      {/* ── Modals ──────────────────────────────────────────────────────────── */}
       <ProductDetailModal
         product={detailProduct}
         activeAssets={detailEnriched?.activeAssets ?? 0}
@@ -455,14 +601,17 @@ export default function ProductsPage() {
         evoCount={detailEnriched?.evoCount ?? 0}
         onClose={() => setDetailProduct(null)}
       />
-      <EditProductModal product={editProduct} onClose={() => setEditProduct(null)} />
-      <AddProductModal opened={addOpen} onClose={() => setAddOpen(false)} />
+      <UpdateProductModal product={updateProduct} onClose={() => setUpdateProduct(null)} />
+      <DeleteProductModal product={deleteProduct} onClose={() => setDeleteProduct(null)} />
+      <CreateProductModal opened={createOpen}   onClose={() => setCreateOpen(false)} />
+      <DownloadModal      opened={downloadOpen} onClose={() => setDownloadOpen(false)} columns={columns} />
 
-      {/* ── Drawers ─────────────────────────────────────────────────────────── */}
-      <EvoFiltersDrawer
-        opened={filtersOpen} onClose={() => setFiltersOpen(false)}
-        sections={PRODUCTS_FILTER_SECTIONS} values={filterValues}
-        onChange={handleFilterChange} onReset={handleFilterReset}
+      <EvoProductsFiltersDrawer
+        opened={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        formControl={formMethods}
+        onChangeFilter={onChangeFilter}
+        onResetAll={onResetAllFilters}
       />
       <EvoPreferencesDrawer
         opened={prefsOpen} onClose={() => setPrefsOpen(false)}
