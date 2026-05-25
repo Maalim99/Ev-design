@@ -13,8 +13,7 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { label: "Dashboard",    href: "/" },
-  { label: "Analytics",    href: "/analytics" },
+  { label: "Analytics",    href: "/" },
   { label: "Accounts",     href: "/accounts" },
   { label: "EMC Centers",  href: "/emcs" },
   { label: "Payments",     href: "/payments" },

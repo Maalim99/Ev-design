@@ -153,7 +153,7 @@ export const SPONSORS: Sponsor[] = [
 
 // ─── Fleet Assets ────────────────────────────────────────────────────────────
 
-export type AssetFleetStatus = "ON_ROAD" | "OFF_ROAD_IDLE" | "OFF_ROAD_FAULTY" | "RETIRED" | "WRITTEN_OFF";
+export type AssetFleetStatus = "ON_ROAD" | "OFF_ROAD_IDLE" | "OFF_ROAD_FAULTY" | "RETIRED_PAID_OFF" | "RETIRED_UNDER_PAID" | "RETIRED_OVER_PAID" | "WRITTEN_OFF";
 export type AssetEvType = "TWO_WHEELER" | "THREE_WHEELER" | "CART";
 
 export interface FleetAsset {
@@ -184,7 +184,10 @@ export const FLEET_ASSETS: FleetAsset[] = [
   { id: "a7",  assetCode: "A-222", assetKey: "SN-T1-20251005-02", productCode: "ALTECH-T1-2B",   evType: "THREE_WHEELER", chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00222", invoiceNumber: "INV-2025-0222", invoiceDate: "2025-10-05", deploymentDate: null,         emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", status: "OFF_ROAD_IDLE",   assignedEvoCode: null,       assignedEvoName: null             },
   { id: "a8",  assetCode: "A-231", assetKey: "SN-F3-20251101-01", productCode: "ALTECH-F3-2B",   evType: "TWO_WHEELER",   chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00231", invoiceNumber: "INV-2025-0231", invoiceDate: "2025-11-01", deploymentDate: "2025-12-21", emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", status: "ON_ROAD",         assignedEvoCode: "EVO-1004", assignedEvoName: "Ilunga Nsenga"    },
   { id: "a9",  assetCode: "A-232", assetKey: "SN-EC-20251101-01", productCode: "ALTECH-ECAT-A1", evType: "CART",          chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00232", invoiceNumber: "INV-2025-0232", invoiceDate: "2025-11-01", deploymentDate: null,         emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", status: "OFF_ROAD_IDLE",   assignedEvoCode: null,       assignedEvoName: null             },
-  { id: "a10", assetCode: "A-233", assetKey: "SN-E3-20251115-01", productCode: "ALTECH-E3-2B",   evType: "TWO_WHEELER",   chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00233", invoiceNumber: "INV-2025-0233", invoiceDate: "2025-11-15", deploymentDate: "2025-11-26", emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", status: "ON_ROAD",         assignedEvoCode: "EVO-1016", assignedEvoName: "Grace Mbuyi"      },
+  { id: "a10", assetCode: "A-233", assetKey: "SN-E3-20251115-01", productCode: "ALTECH-E3-2B",   evType: "TWO_WHEELER",   chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00233", invoiceNumber: "INV-2025-0233", invoiceDate: "2025-11-15", deploymentDate: "2025-11-26", emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", status: "ON_ROAD",            assignedEvoCode: "EVO-1016", assignedEvoName: "Grace Mbuyi"    },
+  { id: "a11", assetCode: "A-241", assetKey: "SN-F3-20240601-01", productCode: "ALTECH-F3-2B",   evType: "TWO_WHEELER",   chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00241", invoiceNumber: "INV-2024-0241", invoiceDate: "2024-06-01", deploymentDate: "2024-06-15", emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", status: "RETIRED_PAID_OFF",    assignedEvoCode: null,       assignedEvoName: null             },
+  { id: "a12", assetCode: "A-242", assetKey: "SN-T1-20240715-01", productCode: "ALTECH-T1-2B",   evType: "THREE_WHEELER", chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00242", invoiceNumber: "INV-2024-0242", invoiceDate: "2024-07-15", deploymentDate: "2024-08-01", emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", status: "RETIRED_UNDER_PAID",  assignedEvoCode: null,       assignedEvoName: null             },
+  { id: "a13", assetCode: "A-243", assetKey: "SN-EC-20231201-01", productCode: "ALTECH-ECAT-A1", evType: "CART",          chipType: "Omnivoltaic", omnivoltaicDeviceId: "OV-DVC-00243", invoiceNumber: "INV-2023-0243", invoiceDate: "2023-12-01", deploymentDate: "2024-01-10", emcName: "Kinshasa Sud",  emcCode: "EMC-KIN-S01", status: "WRITTEN_OFF",         assignedEvoCode: null,       assignedEvoName: null             },
 ];
 
 // ─── BGC Tasks ────────────────────────────────────────────────────────────────
@@ -413,5 +416,5 @@ export const EMC_BATTERIES: EmcBattery[] = [
   { id: "b7",  batteryCode: "BAT-KAT-001-002", legacyEmcCode: "EMC-KAT-001", compatibleEvType: "THREE_WHEELER", capacityKwh: 2.4, cycleCount: 67,  rangeKm: 125, status: "OFF_ROAD_IDLE"   },
   { id: "b8",  batteryCode: "BAT-GOM-001-001", legacyEmcCode: "EMC-GOM-001", compatibleEvType: "TWO_WHEELER",   capacityKwh: 1.8, cycleCount: 280, rangeKm: 80,  status: "ON_ROAD"         },
   { id: "b9",  batteryCode: "BAT-GOM-001-002", legacyEmcCode: "EMC-GOM-001", compatibleEvType: "CART",          capacityKwh: 3.2, cycleCount: 155, rangeKm: 100, status: "OFF_ROAD_IDLE"   },
-  { id: "b10", batteryCode: "BAT-GOM-001-003", legacyEmcCode: "EMC-GOM-001", compatibleEvType: "TWO_WHEELER",   capacityKwh: 1.8, cycleCount: 380, rangeKm: 48,  status: "RETIRED"         },
+  { id: "b10", batteryCode: "BAT-GOM-001-003", legacyEmcCode: "EMC-GOM-001", compatibleEvType: "TWO_WHEELER",   capacityKwh: 1.8, cycleCount: 380, rangeKm: 48,  status: "RETIRED_PAID_OFF" },
 ];

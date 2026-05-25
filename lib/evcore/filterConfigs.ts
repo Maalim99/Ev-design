@@ -70,9 +70,13 @@ export const ASSETS_FILTER_SECTIONS: FilterSection[] = [
   {
     id: "status", label: "Status",
     options: [
-      { id: "ON_ROAD",        name: "On Road" },
-      { id: "OFF_ROAD_IDLE",  name: "Off Road – Idle" },
-      { id: "OFF_ROAD_FAULTY",name: "Off Road – Faulty" },
+      { id: "ON_ROAD",             name: "On Road" },
+      { id: "OFF_ROAD_IDLE",       name: "Off Road – Idle" },
+      { id: "OFF_ROAD_FAULTY",     name: "Off Road – Faulty" },
+      { id: "RETIRED_PAID_OFF",    name: "Retired – Paid Off" },
+      { id: "RETIRED_UNDER_PAID",  name: "Retired – Under Paid" },
+      { id: "RETIRED_OVER_PAID",   name: "Retired – Over Paid" },
+      { id: "WRITTEN_OFF",         name: "Written Off" },
     ],
   },
   {
