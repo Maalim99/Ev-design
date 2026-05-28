@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { Clock, CheckCircle2, AlertCircle, FileCheck, Eye, UserPlus, ClipboardCheck, ShieldCheck, ShieldX } from "lucide-react";
+import { Clock, CheckCircle2, AlertCircle, FileCheck, Eye, UserPlus, ClipboardCheck, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoFiltersDrawer } from "@/components/evcore/filters/EvoFiltersDrawer";
-import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
+import { EvoPreferencesDrawer } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
@@ -13,24 +13,25 @@ import { Modal } from "@/components/lamt/modal";
 import { BGC_TASKS, type BgcTask, type BgcTaskStatus, type BgcRecommendation } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
 import { BGC_FILTER_SECTIONS, BGC_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const BGC_AGENTS    = ["Jean-Pierre Ndinga", "Patience Wa Mwila", "Ambroise Kabong"];
 
-const STATUS_STYLE: Record<BgcTaskStatus, { label: string; bg: string; text: string }> = {
-  UNASSIGNED: { label: "Unassigned", bg: "#F3F3F1", text: "#6B7280" },
-  ASSIGNED:   { label: "Assigned",   bg: "#E6F1FB", text: "#185FA5" },
-  SUBMITTED:  { label: "Submitted",  bg: "#F0EAFB", text: "#5B21B6" },
-  APPROVED:   { label: "Approved",   bg: "#E1F5EE", text: "#0F6E56" },
-  REJECTED:   { label: "Rejected",   bg: "#FEE2E2", text: "#991B1B" },
-  RETURNED:   { label: "Returned",   bg: "#FAEEDA", text: "#854F0B" },
+const STATUS_CHIP: Record<BgcTaskStatus, { type: StatusChipType; label: string }> = {
+  UNASSIGNED: { type: StatusChipType.Normal,  label: "Unassigned" },
+  ASSIGNED:   { type: StatusChipType.Accent,  label: "Assigned"   },
+  SUBMITTED:  { type: StatusChipType.Info,    label: "Submitted"  },
+  APPROVED:   { type: StatusChipType.Success, label: "Approved"   },
+  REJECTED:   { type: StatusChipType.Danger,  label: "Rejected"   },
+  RETURNED:   { type: StatusChipType.Warning, label: "Returned"   },
 };
 
-const REC_STYLE: Record<BgcRecommendation, { label: string; bg: string; text: string }> = {
-  RECOMMENDED:   { label: "Recommended",   bg: "#E1F5EE", text: "#0F6E56" },
-  REJECTED:      { label: "Rejected",      bg: "#FEE2E2", text: "#991B1B" },
-  MANUAL_REVIEW: { label: "Manual Review", bg: "#F0EAFB", text: "#5B21B6" },
+const REC_CHIP: Record<BgcRecommendation, { type: StatusChipType; label: string }> = {
+  RECOMMENDED:   { type: StatusChipType.Success, label: "Recommended"   },
+  REJECTED:      { type: StatusChipType.Danger,  label: "Rejected"      },
+  MANUAL_REVIEW: { type: StatusChipType.Info,    label: "Manual Review" },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -54,14 +55,6 @@ function fmtDate(s: string) {
 
 // ─── Primitives ───────────────────────────────────────────────────────────────
 
-function Chip({ label, bg, text }: { label: string; bg: string; text: string }) {
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 9px", borderRadius: 99, backgroundColor: bg, color: text, fontSize: 11, fontWeight: 600, whiteSpace: "nowrap" }}>
-      <span style={{ width: 5, height: 5, borderRadius: "50%", backgroundColor: text, flexShrink: 0 }} />
-      {label}
-    </span>
-  );
-}
 
 function DaysCell({ days }: { days: number }) {
   const color  = days < 7 ? "#0F6E56" : days <= 14 ? "#854F0B" : "#991B1B";
@@ -142,7 +135,7 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
   onReturn: () => void;
 }) {
   if (!task) return null;
-  const stSt = STATUS_STYLE[task.status];
+  const stSt = STATUS_CHIP[task.status];
   const days = getDaysOpen(task);
   const daysColor = days > 14 ? EVCORE_COLORS.danger : days > 7 ? EVCORE_COLORS.amber : EVCORE_COLORS.green;
 
@@ -176,7 +169,7 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
         {task.evoCode}
       </span>
       {task.finalRecommendation && (
-        <Chip label={REC_STYLE[task.finalRecommendation].label} bg={REC_STYLE[task.finalRecommendation].bg} text={REC_STYLE[task.finalRecommendation].text} />
+        <StatusChip type={REC_CHIP[task.finalRecommendation].type}>{REC_CHIP[task.finalRecommendation].label}</StatusChip>
       )}
     </span>
   );
@@ -199,7 +192,7 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
           <div style={{ fontSize: 22, fontWeight: 700, color: daysColor, marginBottom: 8 }}>{days}d</div>
           <div style={{ fontSize: 12, marginBottom: 3 }}>
             <span style={{ color: EVCORE_COLORS.textSecondary }}>Task status · </span>
-            <span style={{ color: stSt.text, fontWeight: 600 }}>{stSt.label}</span>
+            <StatusChip type={stSt.type}>{stSt.label}</StatusChip>
           </div>
           <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>Registered · {fmtDate(task.createdAt)}</div>
         </div>
@@ -212,36 +205,10 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
         <PhaseCard title="Phase 3 — Neighbors" result={p3Result} fields={p3Fields} />
       </div>
 
-      {/* Auto-decision banner */}
-      {task.finalRecommendation === "RECOMMENDED" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 8, padding: "13px 16px", backgroundColor: "#EBF8F3", marginBottom: 18 }}>
-          <ShieldCheck size={16} color="#0F6E56" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#0F6E56" }}>Auto-decision: RECOMMENDED — all 3 phases passed successfully</span>
-        </div>
-      )}
-      {task.finalRecommendation === "REJECTED" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 8, padding: "13px 16px", backgroundColor: "#FEF2F2", border: "1px solid #FCA5A5", marginBottom: 18 }}>
-          <ShieldX size={16} color="#991B1B" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#991B1B" }}>Auto-decision: REJECTED — one or more phase conditions failed</span>
-        </div>
-      )}
-      {task.finalRecommendation === "MANUAL_REVIEW" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 8, padding: "13px 16px", backgroundColor: "#FEFBF0", border: "1px solid #F6D093", marginBottom: 18 }}>
-          <AlertCircle size={16} color="#854F0B" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#854F0B" }}>Manual review required — mixed results across phases</span>
-        </div>
-      )}
-      {!task.finalRecommendation && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 8, padding: "13px 16px", backgroundColor: EVCORE_COLORS.pageBg, border: `0.5px solid ${EVCORE_COLORS.border}`, marginBottom: 18 }}>
-          <Clock size={16} color={EVCORE_COLORS.textSecondary} style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>BGC in progress — awaiting field agent to complete all 3 phases</span>
-        </div>
-      )}
-
       {/* Footer actions — UNASSIGNED and SUBMITTED only; all others use the X button to close */}
       {task.status === "UNASSIGNED" && (
         <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 16, borderTop: `0.5px solid ${EVCORE_COLORS.border}` }}>
-          <button onClick={() => { onClose(); onAssign(); }} style={{ height: 38, padding: "0 22px", borderRadius: 8, border: "none", backgroundColor: "#185FA5", fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>Assign AAROVE Agent</button>
+          <button onClick={() => { onClose(); onAssign(); }} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: "none", backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer" }}>Assign AAROVE Agent</button>
         </div>
       )}
       {task.status === "SUBMITTED" && (
@@ -284,7 +251,7 @@ function AssignAgentModal({ task, onClose }: { task: BgcTask | null; onClose: ()
             <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>· {task.province}</span>
           </div>
         </div>
-        <Chip label={STATUS_STYLE.UNASSIGNED.label} bg={STATUS_STYLE.UNASSIGNED.bg} text={STATUS_STYLE.UNASSIGNED.text} />
+        <StatusChip type={STATUS_CHIP.UNASSIGNED.type}>{STATUS_CHIP.UNASSIGNED.label}</StatusChip>
       </div>
       <div style={{ marginBottom: 22 }}>
         <label style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Select AAROVE agent</label>
@@ -309,7 +276,7 @@ function AssignAgentModal({ task, onClose }: { task: BgcTask | null; onClose: ()
 
 function ApproveBgcModal({ task, onClose }: { task: BgcTask | null; onClose: () => void }) {
   if (!task) return null;
-  const rec = task.finalRecommendation ? REC_STYLE[task.finalRecommendation] : null;
+  const rec = task.finalRecommendation ? REC_CHIP[task.finalRecommendation] : null;
   return (
     <Modal opened title="Approve BGC" maxWidth={440} onClose={onClose}>
       <div style={{ padding: "12px 16px", borderRadius: 10, backgroundColor: EVCORE_COLORS.pageBg, border: `0.5px solid ${EVCORE_COLORS.border}`, marginBottom: 16 }}>
@@ -319,12 +286,9 @@ function ApproveBgcModal({ task, onClose }: { task: BgcTask | null; onClose: () 
       {rec && (
         <div style={{ marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>System recommendation:</span>
-          <Chip label={rec.label} bg={rec.bg} text={rec.text} />
+          <StatusChip type={rec.type}>{rec.label}</StatusChip>
         </div>
       )}
-      <div style={{ borderRadius: 8, padding: "11px 13px", backgroundColor: "#EBF8F3", border: `0.5px solid ${EVCORE_COLORS.greenLight}`, fontSize: 12, color: "#0F6E56", lineHeight: 1.65, marginBottom: 22 }}>
-        Approving this BGC will advance the EVO account to <strong>Awaiting Training</strong> status. This action cannot be undone.
-      </div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <button onClick={onClose} style={{ height: 40, padding: "0 20px", borderRadius: 8, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 13, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}>Cancel</button>
         <button onClick={onClose} style={{ height: 40, padding: "0 22px", borderRadius: 8, border: "none", backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>
@@ -463,8 +427,8 @@ export default function BgcPage() {
 
   const tableData = filtered.map(t => {
     const phase = getPhase(t);
-    const phaseStyle = { "1": { label: "Phase 1", bg: "#E6F1FB", text: "#185FA5" }, "2": { label: "Phase 2", bg: "#FAEEDA", text: "#854F0B" }, "3": { label: "Phase 3", bg: "#E1F5EE", text: "#0F6E56" }, "done": { label: "Complete", bg: "#E1F5EE", text: "#0F6E56" } }[phase];
-    const stSt = STATUS_STYLE[t.status];
+    const phaseChip = { "1": { type: StatusChipType.Accent, label: "Phase 1" }, "2": { type: StatusChipType.Warning, label: "Phase 2" }, "3": { type: StatusChipType.Success, label: "Phase 3" }, "done": { type: StatusChipType.Success, label: "Complete" } }[phase];
+    const stSt = STATUS_CHIP[t.status];
     const days = getDaysOpen(t);
 
     return {
@@ -484,10 +448,10 @@ export default function BgcPage() {
       agent: t.assignedTo
         ? <span style={{ fontSize: 12 }}>{t.assignedTo}</span>
         : <span style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.amber }}>Unassigned</span>,
-      phase: <Chip label={phaseStyle.label} bg={phaseStyle.bg} text={phaseStyle.text} />,
-      status: <Chip label={stSt.label} bg={stSt.bg} text={stSt.text} />,
+      phase:  <StatusChip type={phaseChip.type}>{phaseChip.label}</StatusChip>,
+      status: <StatusChip type={stSt.type}>{stSt.label}</StatusChip>,
       recommendation: t.finalRecommendation
-        ? <Chip label={REC_STYLE[t.finalRecommendation].label} bg={REC_STYLE[t.finalRecommendation].bg} text={REC_STYLE[t.finalRecommendation].text} />
+        ? <StatusChip type={REC_CHIP[t.finalRecommendation].type}>{REC_CHIP[t.finalRecommendation].label}</StatusChip>
         : <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>—</span>,
       daysOpen: <DaysCell days={days} />,
       _raw: t,

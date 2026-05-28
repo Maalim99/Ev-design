@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -38,13 +37,6 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
               {icon && <span>{icon}</span>}
               {title}
             </DialogTitle>
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
-              aria-label="Close"
-            >
-              <X size={20} />
-            </button>
           </DialogHeader>
           <div className="mt-4">{children}</div>
         </DialogContent>

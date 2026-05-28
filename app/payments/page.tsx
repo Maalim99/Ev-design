@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { CreditCard, TrendingUp, Users, Eye, CheckCircle2, Clock, XCircle, Zap } from "lucide-react";
+import { CreditCard, TrendingUp, Users, Eye, Zap } from "lucide-react";
 
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoPaymentFiltersDrawer } from "@/components/evcore/filters/EvoPaymentFiltersDrawer";
+import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
@@ -14,6 +14,7 @@ import { FilterMethod } from "@/components/lamt/filter-method";
 import { Modal } from "@/components/lamt/modal";
 import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { FilterType, Method } from "@/lib/filter-utils";
 
 import { PAYMENT_RECORDS, type PaymentRecord, type PaymentChannel, type PaymentType, type PaymentStatus } from "@/data/dummy";
@@ -48,30 +49,22 @@ function applyFilterMethod(
 
 // ─── Chip styles ───────────────────────────────────────────────────────────────
 
-const CHANNEL_STYLE: Record<PaymentChannel, { label: string; bg: string; text: string }> = {
-  MPESA:        { label: "M-Pesa",       bg: "#E1F5EE", text: "#0F6E56" },
-  AIRTEL_MONEY: { label: "Airtel Money", bg: "#FEE2E2", text: "#991B1B" },
-  ORANGE_MONEY: { label: "Orange Money", bg: "#FAEEDA", text: "#854F0B" },
+const CHANNEL_CHIP: Record<PaymentChannel, { type: StatusChipType; label: string }> = {
+  MPESA:        { type: StatusChipType.Success, label: "M-Pesa"       },
+  AIRTEL_MONEY: { type: StatusChipType.Danger,  label: "Airtel Money" },
+  ORANGE_MONEY: { type: StatusChipType.Warning, label: "Orange Money" },
 };
 
-const TYPE_STYLE: Record<PaymentType, { label: string; bg: string; text: string }> = {
-  SUBSCRIPTION: { label: "Subscription", bg: "#EEF2FF", text: "#3730A3" },
-  RENTAL:       { label: "Rental",       bg: "#F0EAFB", text: "#5B21B6" },
+const TYPE_CHIP: Record<PaymentType, { type: StatusChipType; label: string }> = {
+  SUBSCRIPTION: { type: StatusChipType.Info,  label: "Subscription" },
+  RENTAL:       { type: StatusChipType.InfoM, label: "Rental"       },
 };
 
-const STATUS_STYLE: Record<PaymentStatus, { label: string; bg: string; text: string; icon: React.ReactNode }> = {
-  COMPLETED: { label: "Completed", bg: "#E1F5EE", text: "#0F6E56", icon: <CheckCircle2 size={10} /> },
-  PENDING:   { label: "Pending",   bg: "#FEF9EE", text: "#854F0B", icon: <Clock size={10} /> },
-  FAILED:    { label: "Failed",    bg: "#FEE2E2", text: "#991B1B", icon: <XCircle size={10} /> },
+const STATUS_CHIP: Record<PaymentStatus, { type: StatusChipType; label: string }> = {
+  COMPLETED: { type: StatusChipType.Success, label: "Completed" },
+  PENDING:   { type: StatusChipType.Warning, label: "Pending"   },
+  FAILED:    { type: StatusChipType.Danger,  label: "Failed"    },
 };
-
-function Chip({ bg, text, label, icon }: { bg: string; text: string; label: string; icon?: React.ReactNode }) {
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 22, padding: "0 9px", borderRadius: 99, backgroundColor: bg, color: text, fontSize: 11, fontWeight: 600 }}>
-      {icon}{label}
-    </span>
-  );
-}
 
 // ─── Shortcut filter popover button ──────────────────────────────────────────
 
@@ -118,9 +111,9 @@ function ShortcutFilterButton({ label, isActive, children }: { label: string; is
 
 function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | null; onClose: () => void }) {
   if (!payment) return null;
-  const ch = CHANNEL_STYLE[payment.paymentChannel];
-  const ty = TYPE_STYLE[payment.paymentType];
-  const st = STATUS_STYLE[payment.status];
+  const ch = CHANNEL_CHIP[payment.paymentChannel];
+  const ty = TYPE_CHIP[payment.paymentType];
+  const st = STATUS_CHIP[payment.status];
   const dt = new Date(payment.paymentDatetime);
 
   const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
@@ -139,14 +132,14 @@ function PaymentDetailModal({ payment, onClose }: { payment: PaymentRecord | nul
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: EVCORE_COLORS.textPrimary }}>{payment.currency} {payment.amount}.00</div>
-          <Chip {...st} />
+          <StatusChip type={st.type}>{st.label}</StatusChip>
         </div>
       </div>
       <div style={{ marginBottom: 20 }}>
         <Row label="Payment Reference"  value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{payment.paymentReference}</span>} />
         <Row label="Channel Reference"  value={<span style={{ fontFamily: "monospace", fontSize: 12 }}>{payment.channelReference}</span>} />
-        <Row label="Payment Type"       value={<Chip {...ty} />} />
-        <Row label="Channel"            value={<Chip {...ch} />} />
+        <Row label="Payment Type"       value={<StatusChip type={ty.type}>{ty.label}</StatusChip>} />
+        <Row label="Channel"            value={<StatusChip type={ch.type}>{ch.label}</StatusChip>} />
         <Row label="EMC"                value={payment.emcName} />
         <Row label="Date & Time"        value={dt.toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} />
         <Row
@@ -321,10 +314,10 @@ export default function PaymentsPage() {
     evoCode:    p => <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.green }}>{p.evoCode}</span>,
     evoName:    p => <span style={{ fontSize: 13, fontWeight: 600, color: EVCORE_COLORS.textPrimary }}>{p.evoName}</span>,
     emc:        p => <span style={{ fontSize: 12 }}>{p.emcName}</span>,
-    type:       p => <Chip {...TYPE_STYLE[p.paymentType]} />,
+    type:       p => { const t = TYPE_CHIP[p.paymentType];    return <StatusChip type={t.type}>{t.label}</StatusChip>; },
     amount:     p => <span style={{ fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.textPrimary, fontFamily: "monospace" }}>{p.currency} {p.amount}.00</span>,
-    channel:    p => <Chip {...CHANNEL_STYLE[p.paymentChannel]} />,
-    status:     p => <Chip {...STATUS_STYLE[p.status]} />,
+    channel:    p => { const c = CHANNEL_CHIP[p.paymentChannel]; return <StatusChip type={c.type}>{c.label}</StatusChip>; },
+    status:     p => { const s = STATUS_CHIP[p.status];          return <StatusChip type={s.type}>{s.label}</StatusChip>; },
     activation: p => p.activationCodeGenerated
       ? <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, color: "#0F6E56", fontWeight: 600 }}><Zap size={11} />Yes</span>
       : <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>—</span>,
@@ -407,7 +400,8 @@ export default function PaymentsPage() {
       <DownloadModal       opened={downloadOpen} onClose={() => setDownloadOpen(false)} columns={columns} />
 
       {/* Filter drawer */}
-      <EvoPaymentFiltersDrawer
+      <EvoFormFiltersDrawer
+        sections={EVO_PAYMENT_FILTER_SECTIONS}
         opened={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         formControl={formMethods}

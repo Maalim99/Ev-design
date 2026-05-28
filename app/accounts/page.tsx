@@ -10,7 +10,7 @@ import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoStatusChip } from "@/components/evcore/ui/EvoStatusChip";
 import { EvoDetailModal, DeleteConfirmModal } from "@/components/evcore/ui/EvoDetailModal";
 import { RegisterEvoModal } from "@/components/evcore/modals/RegisterEvoModal";
-import { EvoAccountFiltersDrawer } from "@/components/evcore/filters/EvoAccountFiltersDrawer";
+import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
@@ -537,7 +537,8 @@ export default function EvoAccountsPage() {
       <DownloadModal     opened={downloadOpen}    onClose={() => setDownloadOpen(false)} columns={columns} />
 
       {/* Filter drawer — FilterExpandable sections, mirrors LAMT TableFilters */}
-      <EvoAccountFiltersDrawer
+      <EvoFormFiltersDrawer
+        sections={EVO_ACCOUNT_FILTER_SECTIONS}
         opened={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         formControl={formMethods}

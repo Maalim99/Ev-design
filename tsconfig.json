@@ -19,7 +19,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@evcore": ["./components/evcore/index.ts"],
+      "@evcore/*": ["./components/evcore/*"],
+      "@lamt/*": ["./components/lamt/*"],
+      "@ui/*": ["./components/ui/*"]
     }
   },
   "include": [

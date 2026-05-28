@@ -14,15 +14,16 @@ import { FLEET_ASSETS, type AssetFleetStatus, type AssetEvType } from "@/data/du
 import { RegisterAssetModal } from "@/components/evcore/modals/RegisterAssetModal";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
 import { ASSETS_FILTER_SECTIONS, ASSETS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 
-const FLEET_STATUS_STYLE: Record<AssetFleetStatus, { label: string; bg: string; text: string }> = {
-  ON_ROAD:             { label: "On Road",            bg: "#E1F5EE", text: "#0F6E56" },
-  OFF_ROAD_IDLE:       { label: "Available",          bg: "#E6F1FB", text: "#185FA5" },
-  OFF_ROAD_FAULTY:     { label: "Faulty",             bg: "#FAEEDA", text: "#854F0B" },
-  RETIRED_PAID_OFF:    { label: "Retired – Paid Off", bg: "#F3F3F1", text: "#6B7280" },
-  RETIRED_UNDER_PAID:  { label: "Retired – Underpaid",bg: "#FEF9EE", text: "#854F0B" },
-  RETIRED_OVER_PAID:   { label: "Retired – Overpaid", bg: "#EFF6FF", text: "#185FA5" },
-  WRITTEN_OFF:         { label: "Written Off",        bg: "#FEE2E2", text: "#991B1B" },
+const FLEET_STATUS_CHIP: Record<AssetFleetStatus, { type: StatusChipType; label: string }> = {
+  ON_ROAD:            { type: StatusChipType.Success,  label: "On Road"           },
+  OFF_ROAD_IDLE:      { type: StatusChipType.Accent,   label: "Available"         },
+  OFF_ROAD_FAULTY:    { type: StatusChipType.Warning,  label: "Faulty"            },
+  RETIRED_PAID_OFF:   { type: StatusChipType.Normal,   label: "Retired – Paid Off"},
+  RETIRED_UNDER_PAID: { type: StatusChipType.DangerM,  label: "Retired – Underpaid"},
+  RETIRED_OVER_PAID:  { type: StatusChipType.AccentM,  label: "Retired – Overpaid"},
+  WRITTEN_OFF:        { type: StatusChipType.Danger,   label: "Written Off"       },
 };
 
 const EV_TYPE_LABEL: Record<AssetEvType, string> = {
@@ -32,13 +33,8 @@ const EV_TYPE_LABEL: Record<AssetEvType, string> = {
 };
 
 function FleetStatusChip({ status }: { status: AssetFleetStatus }) {
-  const s = FLEET_STATUS_STYLE[status];
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 9px", borderRadius: 99, backgroundColor: s.bg, color: s.text, fontSize: 11, fontWeight: 600 }}>
-      <span style={{ width: 5, height: 5, borderRadius: "50%", backgroundColor: s.text }} />
-      {s.label}
-    </span>
-  );
+  const { type, label } = FLEET_STATUS_CHIP[status];
+  return <StatusChip type={type}>{label}</StatusChip>;
 }
 
 function ActionBtn({ label, onClick, color }: { label: string; onClick: () => void; color?: string }) {

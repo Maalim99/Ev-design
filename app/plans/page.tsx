@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { CreditCard, Users, TrendingUp, Eye, ToggleLeft, ToggleRight, Pencil } from "lucide-react";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoPlansFiltersDrawer } from "@/components/evcore/filters/EvoPlansFiltersDrawer";
+import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
@@ -17,6 +17,7 @@ import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/tabl
 import { FilterType, Method } from "@/lib/filter-utils";
 import { RENTAL_PLANS, EVO_ACCOUNTS, type RentalPlan } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { PLANS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
 import {
   EVO_PLANS_FILTER_SECTIONS,
@@ -55,9 +56,9 @@ const FORM_LABEL: React.CSSProperties = {
 
 function ActiveChip({ active }: { active: boolean }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", height: 22, padding: "0 9px", borderRadius: 99, fontSize: 10, fontWeight: 600, backgroundColor: active ? "#E1F5EE" : "#F3F3F1", color: active ? "#0F6E56" : "#6B7280" }}>
+    <StatusChip type={active ? StatusChipType.Success : StatusChipType.Normal}>
       {active ? "Active" : "Inactive"}
-    </span>
+    </StatusChip>
   );
 }
 
@@ -526,9 +527,6 @@ export default function PlansPage() {
             </div>
           )}
 
-          <div style={{ backgroundColor: "#EBF8F3", border: `0.5px solid ${EVCORE_COLORS.greenLight}`, borderRadius: 8, padding: "11px 14px", fontSize: 12, color: "#0F6E56", lineHeight: 1.6 }}>
-            <strong>Billing:</strong> Daily rental applies Mon–Sat. Sunday rate is reduced. Activation code valid 06:00–21:00 (15h window), expires after 48h. Generated via Omnivoltaic IoT on confirmed payment.
-          </div>
         </div>
       </AppShell>
 
@@ -538,7 +536,8 @@ export default function PlansPage() {
       <CreatePlanModal  opened={createOpen}   onClose={() => setCreateOpen(false)} />
       <DownloadModal    opened={downloadOpen} onClose={() => setDownloadOpen(false)} columns={columns} />
 
-      <EvoPlansFiltersDrawer
+      <EvoFormFiltersDrawer
+        sections={EVO_PLANS_FILTER_SECTIONS}
         opened={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         formControl={formMethods}

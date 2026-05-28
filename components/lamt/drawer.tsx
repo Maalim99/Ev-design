@@ -26,13 +26,20 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
   ({ title, opened, onClose, children, side = "right", className }, ref) => {
     return (
       <Sheet open={opened} onOpenChange={(open) => !open && onClose()}>
-        <SheetContent ref={ref} side={side} className={className}>
+        <SheetContent
+          ref={ref}
+          side={side}
+          className={cn(
+            "bg-white border-[#E8EDF4] shadow-[0_0_30px_rgba(55,74,97,0.2)] p-[30px]",
+            className
+          )}
+        >
           {title && (
-            <SheetHeader>
+            <SheetHeader className="p-0 mb-4">
               <SheetTitle>{title}</SheetTitle>
             </SheetHeader>
           )}
-          <div className={cn("flex-1 min-h-0 overflow-y-auto", title ? "mt-4" : "")}>{children}</div>
+          <div className={cn("flex-1 min-h-0 overflow-y-auto")}>{children}</div>
         </SheetContent>
       </Sheet>
     );

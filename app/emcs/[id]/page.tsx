@@ -16,6 +16,7 @@ import { TextInput } from "@/components/lamt/text-input";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoStatusChip } from "@/components/evcore/ui/EvoStatusChip";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { Tabs, type TabItem } from "@/components/lamt/tabs";
 import { Modal } from "@/components/lamt/modal";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
@@ -80,21 +81,9 @@ const FORM_INPUT_STYLE: React.CSSProperties = {
 
 function IsActiveChip({ active }: { active: boolean }) {
   return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        height: 20,
-        padding: "0 8px",
-        borderRadius: 99,
-        fontSize: 10,
-        fontWeight: 700,
-        backgroundColor: active ? "#E1F5EE" : "#F3F3F1",
-        color: active ? "#0F6E56" : "#6B7280",
-      }}
-    >
+    <StatusChip type={active ? StatusChipType.Success : StatusChipType.Normal}>
       {active ? "Active" : "Inactive"}
-    </span>
+    </StatusChip>
   );
 }
 

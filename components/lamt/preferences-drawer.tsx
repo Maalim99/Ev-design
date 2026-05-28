@@ -44,10 +44,8 @@ export const PreferencesDrawer = React.forwardRef<
         </div>
         {opened && contentComponent && (
           <div
-            className={cn(
-              "p-4",
-              contentBackground && `bg-[${contentBackground}]`
-            )}
+            className="p-4"
+            style={contentBackground ? { backgroundColor: contentBackground } : undefined}
           >
             {contentComponent}
           </div>

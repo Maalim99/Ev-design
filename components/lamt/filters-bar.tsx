@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Filter, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button, ButtonKind, ButtonSize } from "./button";
+import { Button, ButtonKind } from "./button";
 
 /**
  * LAMT FiltersBar Component
@@ -36,30 +36,34 @@ export const FiltersBar = React.forwardRef<HTMLDivElement, FiltersBarProps>(
       <div
         ref={ref}
         className={cn(
-          "flex items-center flex-wrap",
+          "flex items-center justify-between",
           "mb-6",
-          "gap-3",
+          "gap-4",
           className
         )}
       >
-        {leftActions &&
-          leftActions.map((action, idx) => <span key={idx}>{action}</span>)}
+        <div className="flex gap-3">
+          {leftActions &&
+            leftActions.map((action, idx) => <span key={idx}>{action}</span>)}
+        </div>
 
-        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClickFilter}>
-          <Filter className="mr-2 h-3 w-3" />
-          Filter ({activeFiltersCount})
-        </Button>
-
-        <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={onClickPreferences}>
-          <Settings className="mr-2 h-3 w-3" />
-          Preferences
-        </Button>
-
-        {onClearFilter && (
-          <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={onClearFilter} className="min-w-40">
-            Clear Filter
+        <div className="flex gap-3">
+          <Button kind={ButtonKind.Ghost} onClick={onClickFilter}>
+            <Filter className="mr-2 h-4 w-4" />
+            Filter ({activeFiltersCount})
           </Button>
-        )}
+
+          <Button kind={ButtonKind.Ghost} onClick={onClickPreferences}>
+            <Settings className="mr-2 h-4 w-4" />
+            Preferences
+          </Button>
+
+          {onClearFilter && (
+            <Button kind={ButtonKind.Primary} onClick={onClearFilter} className="min-w-40">
+              Clear Filter
+            </Button>
+          )}
+        </div>
       </div>
     );
   }

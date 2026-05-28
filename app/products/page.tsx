@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { Package, Bike, ShoppingCart, Layers, Eye, Pencil, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoProductsFiltersDrawer } from "@/components/evcore/filters/EvoProductsFiltersDrawer";
+import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
@@ -17,8 +17,10 @@ import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
 import { FilterType, Method } from "@/lib/filter-utils";
 import { FLEET_ASSETS, EVO_ACCOUNTS } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { PRODUCTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
 import {
+  EVO_PRODUCTS_FILTER_SECTIONS,
   getProductsFilterDefaults,
 } from "@/lib/evcore/evoProductsFilterSections";
 
@@ -66,11 +68,6 @@ function applyFilterMethod(
 
 // ─── Style maps ───────────────────────────────────────────────────────────────
 
-const TYPE_STYLE: Record<string, { bg: string; text: string }> = {
-  "2W":   { bg: "#E1F5EE", text: "#0F6E56" },
-  "3W":   { bg: "#E6F1FB", text: "#185FA5" },
-  "Cart": { bg: "#FAEEDA", text: "#854F0B" },
-};
 
 const EVTYPE_COLOR: Record<EvTypeKey, string> = {
   TWO_WHEELER:   EVCORE_COLORS.green,
@@ -86,20 +83,21 @@ const FORM_LABEL: React.CSSProperties = {
   letterSpacing: "0.04em", marginBottom: 5,
 };
 
+const TYPE_CHIP_TYPE: Record<string, StatusChipType> = {
+  "2W":   StatusChipType.Success,
+  "3W":   StatusChipType.Accent,
+  "Cart": StatusChipType.Warning,
+};
+
 function TypeChip({ type }: { type: string }) {
-  const s = TYPE_STYLE[type] ?? { bg: "#F3F3F1", text: "#6B7280" };
-  return (
-    <span style={{ height: 20, padding: "0 8px", borderRadius: 99, backgroundColor: s.bg, color: s.text, fontSize: 10, fontWeight: 700, display: "inline-flex", alignItems: "center" }}>
-      {type}
-    </span>
-  );
+  return <StatusChip type={TYPE_CHIP_TYPE[type] ?? StatusChipType.Normal}>{type}</StatusChip>;
 }
 
 function ActiveChip({ active }: { active: boolean }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", height: 20, padding: "0 8px", borderRadius: 99, fontSize: 10, fontWeight: 600, backgroundColor: active ? "#E1F5EE" : "#F3F3F1", color: active ? "#0F6E56" : "#6B7280" }}>
+    <StatusChip type={active ? StatusChipType.Success : StatusChipType.Normal}>
       {active ? "Active" : "Inactive"}
-    </span>
+    </StatusChip>
   );
 }
 
@@ -518,11 +516,6 @@ export default function ProductsPage() {
       <AppShell pageTitle="Products">
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          <div style={{ backgroundColor: "#EFF6FF", borderLeft: "3px solid #3B82F6", borderRadius: "0 8px 8px 0", padding: "12px 16px", fontSize: 13, color: "#1E40AF", lineHeight: 1.6 }}>
-            Product codes are reference data used by EVO accounts, EV assets and rental plans.{" "}
-            <strong>Changes affect all linked records.</strong>
-          </div>
-
           <div>
             <PageHeader
               title="Products"
@@ -606,7 +599,8 @@ export default function ProductsPage() {
       <CreateProductModal opened={createOpen}   onClose={() => setCreateOpen(false)} />
       <DownloadModal      opened={downloadOpen} onClose={() => setDownloadOpen(false)} columns={columns} />
 
-      <EvoProductsFiltersDrawer
+      <EvoFormFiltersDrawer
+        sections={EVO_PRODUCTS_FILTER_SECTIONS}
         opened={filtersOpen}
         onClose={() => setFiltersOpen(false)}
         formControl={formMethods}

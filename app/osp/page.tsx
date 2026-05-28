@@ -12,22 +12,18 @@ import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/tabl
 import { EVO_ACCOUNTS, type OspStatus } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
 import { OSP_FILTER_SECTIONS, OSP_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 
-const OSP_STYLE: Record<OspStatus, { label: string; bg: string; text: string }> = {
-  NOT_STARTED: { label: "Not Started", bg: "#F3F3F1", text: "#6B7280" },
-  IN_PROGRESS: { label: "In Progress", bg: "#E6F1FB", text: "#185FA5" },
-  PASSED:      { label: "Passed",      bg: "#E1F5EE", text: "#0F6E56" },
-  FAILED:      { label: "Failed",      bg: "#FEE2E2", text: "#991B1B" },
+const OSP_CHIP_TYPE: Record<OspStatus, { type: StatusChipType; label: string }> = {
+  NOT_STARTED: { type: StatusChipType.Normal,  label: "Not Started" },
+  IN_PROGRESS: { type: StatusChipType.Accent,  label: "In Progress" },
+  PASSED:      { type: StatusChipType.Success, label: "Passed"      },
+  FAILED:      { type: StatusChipType.Danger,  label: "Failed"      },
 };
 
 function OspChip({ status }: { status: OspStatus }) {
-  const s = OSP_STYLE[status];
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 9px", borderRadius: 99, backgroundColor: s.bg, color: s.text, fontSize: 11, fontWeight: 600 }}>
-      <span style={{ width: 5, height: 5, borderRadius: "50%", backgroundColor: s.text, flexShrink: 0 }} />
-      {s.label}
-    </span>
-  );
+  const { type, label } = OSP_CHIP_TYPE[status];
+  return <StatusChip type={type}>{label}</StatusChip>;
 }
 
 // BRD: Written ≥70 AND On-Road ≥70 to certify
@@ -105,7 +101,7 @@ export default function OspPage() {
           <div>
             <PageHeader title="OSP Training Evaluations" actions={[]} />
             <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginTop: 4 }}>
-              {filtered.length} {filtered.length === 1 ? "record" : "records"}{activeFiltersCount > 0 ? " matching filters" : " total"} · Written ≥70 and On-Road ≥70 required for certification
+              {filtered.length} {filtered.length === 1 ? "record" : "records"}{activeFiltersCount > 0 ? " matching filters" : " total"}
             </div>
           </div>
 
@@ -114,14 +110,6 @@ export default function OspPage() {
             <KpiCard label="In Progress" value={String(inProgress)} delta="Active sessions"  deltaType="neutral"  icon={Clock} />
             <KpiCard label="Failed"      value={String(failed)}     delta="Below threshold"  deltaType="negative" icon={XCircle} />
             <KpiCard label="Not Started" value={String(notStarted)} delta="Awaiting session" deltaType="neutral"  icon={AlertCircle} />
-          </div>
-
-          <div style={{ backgroundColor: "#EBF8F3", border: `0.5px solid ${EVCORE_COLORS.greenLight}`, borderRadius: 8, padding: "11px 16px", display: "flex", flexWrap: "wrap", gap: 16, fontSize: 12, color: "#0F6E56" }}>
-            <span><strong>Written Evaluation</strong> — 10 questions · 100 pts · Pass: ≥70</span>
-            <span style={{ color: EVCORE_COLORS.greenLight }}>·</span>
-            <span><strong>On-Road Evaluation</strong> — 12 items · 100 pts · Pass: ≥70</span>
-            <span style={{ color: EVCORE_COLORS.greenLight }}>·</span>
-            <span><strong>Certification</strong> — both evaluations must score ≥70</span>
           </div>
 
           <FiltersBar

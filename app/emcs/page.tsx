@@ -17,6 +17,7 @@ import { TextInput } from "@/components/lamt/text-input";
 import { DUMMY_EMCS, EVO_ACCOUNTS } from "@/data/dummy";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
 import { EMCS_FILTER_SECTIONS, EMCS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -30,22 +31,10 @@ const FORM_LABEL: React.CSSProperties = {
   marginBottom: 5,
 };
 
-const StatusChip = ({ active }: { active: boolean }) => (
-  <span
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      height: 20,
-      padding: "0 7px",
-      borderRadius: 99,
-      fontSize: 10,
-      fontWeight: 600,
-      backgroundColor: active ? "#E1F5EE" : "#F3F3F1",
-      color: active ? "#0F6E56" : "#6B7280",
-    }}
-  >
+const EmcStatusChip = ({ active }: { active: boolean }) => (
+  <StatusChip type={active ? StatusChipType.Success : StatusChipType.Normal}>
     {active ? "Active" : "Inactive"}
-  </span>
+  </StatusChip>
 );
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
@@ -100,7 +89,7 @@ export default function EmcsPage() {
     province: <span style={{ fontSize: 12 }}>{emc.province}</span>,
     manager:  <span style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>{emc.managerName}</span>,
     capacity: <span style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>{emc.chargingCapacity} slots</span>,
-    status:   <StatusChip active={emc.isActive} />,
+    status:   <EmcStatusChip active={emc.isActive} />,
     _raw: emc,
   }));
 
@@ -230,7 +219,7 @@ export default function EmcsPage() {
                             {emc.chargingCapacity} slots · {emc.batteryInventory} units
                           </div>
                           <div style={{ display: "flex", gap: 6, alignItems: "center", justifyContent: "space-between" }}>
-                            <StatusChip active={emc.isActive} />
+                            <EmcStatusChip active={emc.isActive} />
                             <button
                               onClick={() => router.push(`/emcs/${emc.code}`)}
                               style={{ height: 24, padding: "0 8px", borderRadius: 5, border: "none", backgroundColor: "#EBF8F3", color: "#0F6E56", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
