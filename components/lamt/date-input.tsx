@@ -68,7 +68,7 @@ export const DateInput = React.forwardRef<DatePicker, DateInputProps>(
             "border border-[#C9D0D9]",
             "transition-all duration-300 ease-in-out",
             "outline-none",
-            "focus:border-[#07C1FF] focus:shadow-[0_0_0_3px_rgba(7,193,255,0.4)]",
+            "focus:border-[#1D9E75] focus:shadow-[0_0_0_3px_rgba(29,158,117,0.2)]",
             disabled ? "cursor-not-allowed opacity-60" : "cursor-text"
           )}
         />

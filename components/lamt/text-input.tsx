@@ -85,7 +85,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
           error
             ? "border border-[#FF4507] shadow-[0_0_0_3px_rgba(255,69,7,0.4)]"
             : isFocused
-              ? "border border-[#07C1FF] shadow-[0_0_0_3px_rgba(7,193,255,0.4)]"
+              ? "border border-[#1D9E75] shadow-[0_0_0_3px_rgba(29,158,117,0.2)]"
               : "border border-[#C9D0D9]",
           className
         )}

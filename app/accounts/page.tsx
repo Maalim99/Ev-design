@@ -18,6 +18,7 @@ import { FilterMethod } from "@/components/lamt/filter-method";
 import { Modal } from "@/components/lamt/modal";
 import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
+import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { FilterType, Method } from "@/lib/filter-utils";
 
 import {
@@ -32,6 +33,19 @@ import {
   getEvoFilterDefaults,
 } from "@/lib/evcore/evoAccountFilterSections";
 import { ACCOUNTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+
+// ─── EVO status → lamt StatusChip mapping ────────────────────────────────────
+
+const EVO_STATUS_CHIP: Record<string, { type: StatusChipType; label: string }> = {
+  ACTIVE:            { type: StatusChipType.Success, label: "Active"            },
+  AWAITING_BGC:      { type: StatusChipType.Warning, label: "Awaiting BGC"      },
+  AWAITING_TRAINING: { type: StatusChipType.Accent,  label: "Awaiting Training" },
+  AWAITING_PAYMENT:  { type: StatusChipType.Info,    label: "Awaiting Payment"  },
+  PARTIAL_PAYMENT:   { type: StatusChipType.AccentM, label: "Partial Payment"   },
+  AWAITING_HANDOVER: { type: StatusChipType.AccentM, label: "Awaiting Handover" },
+  INACTIVE:          { type: StatusChipType.Normal,  label: "Inactive"          },
+  DISENGAGED:        { type: StatusChipType.Danger,  label: "Disengaged"        },
+};
 
 // ─── Static lookup maps ───────────────────────────────────────────────────────
 
@@ -445,7 +459,7 @@ export default function EvoAccountsPage() {
     phone:        e => <span style={{ fontSize: 12, fontFamily: "monospace" }}>{e.phoneNumbers[0]}</span>,
     emc:          e => <span style={{ fontSize: 12 }}>{e.emcName}</span>,
     product:      e => <span style={{ fontFamily: "monospace", fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.evProductCode}</span>,
-    status:       e => <EvoStatusChip status={e.status} />,
+    status:       e => { const s = EVO_STATUS_CHIP[e.status]; return s ? <StatusChip type={s.type}>{s.label}</StatusChip> : null; },
     balance:      e => <span style={{ fontSize: 12, fontWeight: 500, color: e.balance > 0 ? EVCORE_COLORS.textPrimary : EVCORE_COLORS.textSecondary }}>{e.balance > 0 ? `$${e.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}` : "—"}</span>,
     bgc:          e => <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.bgcDecision ?? "—"}</span>,
     osp:          e => <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.ospStatus ?? "—"}</span>,
@@ -508,7 +522,7 @@ export default function EvoAccountsPage() {
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={activeFiltersCount > 0 ? onResetAllFilters : undefined}
+            
           />
 
           {filtered.length === 0 ? (

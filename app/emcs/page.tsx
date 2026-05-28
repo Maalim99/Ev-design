@@ -137,7 +137,7 @@ export default function EmcsPage() {
           activeFiltersCount={activeFiltersCount}
           onClickFilter={() => setFiltersOpen(true)}
           onClickPreferences={() => setPrefsOpen(true)}
-          onClearFilter={activeFiltersCount > 0 ? handleFilterReset : undefined}
+          
         />
 
         {filteredEmcs.length === 0 ? (

@@ -364,7 +364,7 @@ export default function EvoAccountsPage() {
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={activeFiltersCount > 0 ? handleFilterReset : undefined}
+            
           />
 
           {/* Table or empty state */}

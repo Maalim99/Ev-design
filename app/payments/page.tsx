@@ -375,7 +375,7 @@ export default function PaymentsPage() {
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={activeFiltersCount > 0 ? onResetAllFilters : undefined}
+            
           />
 
           {filtered.length === 0 ? (

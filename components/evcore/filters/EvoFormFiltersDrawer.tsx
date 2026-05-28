@@ -89,6 +89,7 @@ export function EvoFormFiltersDrawer({
           </div>
         </div>
 
+        <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
         {filteredSections.map(section => (
           <div key={section.id} className="mb-2">
             <div className="px-4 py-2 text-[11px] font-bold text-[#92A5BA] uppercase tracking-widest border-b border-[#E8EDF2]">
@@ -109,6 +110,7 @@ export function EvoFormFiltersDrawer({
             ))}
           </div>
         ))}
+        </div>
       </div>
     </Drawer>
   );

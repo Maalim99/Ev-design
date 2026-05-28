@@ -525,7 +525,7 @@ export default function BgcPage() {
             activeFiltersCount={activeFiltersCount}
             onClickFilter={() => setFiltersOpen(true)}
             onClickPreferences={() => setPrefsOpen(true)}
-            onClearFilter={activeFiltersCount > 0 ? handleFilterReset : undefined}
+            
           />
 
           <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, overflow: "hidden" }}>
