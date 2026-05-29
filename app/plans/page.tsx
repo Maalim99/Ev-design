@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { CreditCard, Users, TrendingUp, Eye, ToggleLeft, ToggleRight, Pencil } from "lucide-react";
+import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
@@ -456,29 +457,21 @@ export default function PlansPage() {
   };
   const colDefs = columns.filter(c => c.visible).map(c => ({ headerName: colDefsMap[c.key] ?? c.label, type: TableCellType.component, key: c.key }));
 
-  const rowActions = (row: Record<string, number | string | React.ReactNode | object>) => (
-    <div style={{ display: "flex", gap: 4 }}>
-      <button
-        onClick={() => setDetailPlan(row._raw as RentalPlan)}
-        style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-      >
-        <Eye size={10} /> View
-      </button>
-      <button
-        onClick={() => setUpdatePlan(row._raw as RentalPlan)}
-        style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-      >
-        <Pencil size={10} /> Update
-      </button>
-      <button
-        onClick={() => setTogglePlan(row._raw as RentalPlan)}
-        title={(row._raw as RentalPlan).isActive ? "Deactivate plan" : "Activate plan"}
-        style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, cursor: "pointer", color: (row._raw as RentalPlan).isActive ? EVCORE_COLORS.danger : EVCORE_COLORS.green }}
-      >
-        {(row._raw as RentalPlan).isActive ? <><ToggleLeft size={12} /> Deactivate</> : <><ToggleRight size={12} /> Activate</>}
-      </button>
-    </div>
-  );
+  const rowActions = (row: Record<string, number | string | React.ReactNode | object>) => {
+    const plan = row._raw as RentalPlan;
+    return (
+      <div style={{ display: "flex", gap: 4 }}>
+        <RowActionBtn icon={<Eye size={14} />}    title="View plan"   onClick={() => setDetailPlan(plan)}  variant="green" />
+        <RowActionBtn icon={<Pencil size={14} />} title="Edit plan"   onClick={() => setUpdatePlan(plan)}  variant="blue" />
+        <RowActionBtn
+          icon={plan.isActive ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}
+          title={plan.isActive ? "Deactivate" : "Activate"}
+          onClick={() => setTogglePlan(plan)}
+          variant={plan.isActive ? "danger" : "green"}
+        />
+      </div>
+    );
+  };
 
   const detailEvoCount = detailPlan ? enriched.find(p => p.code === detailPlan.code)?.evoCount ?? 0 : 0;
   const toggleEvoCount = togglePlan ? enriched.find(p => p.code === togglePlan.code)?.evoCount ?? 0 : 0;

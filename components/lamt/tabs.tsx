@@ -29,19 +29,22 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
         onValueChange={onTabChange}
         className={className}
       >
-        <TabsList className="flex gap-4 mb-6 bg-transparent border-b-0">
+        <TabsList className="flex gap-0 mb-6 bg-transparent border-b border-[#E8EDF4] p-0 h-auto rounded-none">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
               value={tab.id}
               className="
-                px-8 py-2.5 min-w-40
-                border-2 rounded-[50px]
-                font-semibold text-base
-                transition-all duration-200
-                data-[state=active]:bg-[#2D3A4A] data-[state=active]:text-white data-[state=active]:border-[#2D3A4A]
-                data-[state=inactive]:bg-white data-[state=inactive]:text-[#2D3A4A] data-[state=inactive]:border-[#D1D5DB]
-                hover:bg-[#F3F4F6] hover:text-[#2D3A4A] hover:border-[#2D3A4A]
+                px-5 py-2.5
+                bg-transparent rounded-none border-none shadow-none
+                text-[13px] font-medium
+                transition-all duration-150
+                data-[state=active]:text-[#1D9E75] data-[state=active]:font-semibold
+                data-[state=active]:border-b-2 data-[state=active]:border-[#1D9E75]
+                data-[state=active]:shadow-none data-[state=active]:bg-transparent
+                data-[state=inactive]:text-[#6B7280]
+                hover:text-[#11171E]
+                -mb-px
               "
             >
               {tab.label}

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Package, Bike, ShoppingCart, Layers, Eye, Pencil, Trash2 } from "lucide-react";
+import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
@@ -487,24 +488,9 @@ export default function ProductsPage() {
     const p = row._raw as Enriched;
     return (
       <div style={{ display: "flex", gap: 4 }}>
-        <button
-          onClick={() => setDetailProduct(p)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-        >
-          <Eye size={10} /> View
-        </button>
-        <button
-          onClick={() => setUpdateProduct(p)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-        >
-          <Pencil size={10} /> Update
-        </button>
-        <button
-          onClick={() => setDeleteProduct(p)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid #FECACA`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.danger, cursor: "pointer" }}
-        >
-          <Trash2 size={10} /> Delete
-        </button>
+        <RowActionBtn icon={<Eye size={14} />}    title="View product"   onClick={() => setDetailProduct(p)}  variant="green" />
+        <RowActionBtn icon={<Pencil size={14} />} title="Edit product"   onClick={() => setUpdateProduct(p)}  variant="blue" />
+        <RowActionBtn icon={<Trash2 size={14} />} title="Delete product" onClick={() => setDeleteProduct(p)}  variant="danger" />
       </div>
     );
   };

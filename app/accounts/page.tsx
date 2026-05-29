@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { Eye, RefreshCw, Trash2, Download } from "lucide-react";
+import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { Users, ClipboardCheck, CheckCircle2, CalendarPlus } from "lucide-react";
 
 import { AppShell } from "@/components/evcore/layout/AppShell";
@@ -77,16 +78,6 @@ function applyFilterMethod(
   }
 }
 
-// ─── Row action button ────────────────────────────────────────────────────────
-
-function ActionBtn({ icon, label, onClick, color }: { icon: React.ReactNode; label: string; onClick: () => void; color?: string }) {
-  return (
-    <button onClick={onClick} title={label}
-      style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: color ?? EVCORE_COLORS.textSecondary, cursor: "pointer", whiteSpace: "nowrap" }}>
-      {icon}{label}
-    </button>
-  );
-}
 
 // ─── Shortcut filter popover button ──────────────────────────────────────────
 
@@ -484,9 +475,9 @@ export default function EvoAccountsPage() {
     const evo = row._raw as EvoAccount;
     return (
       <div style={{ display: "flex", gap: 4 }}>
-        <ActionBtn icon={<Eye size={10} />}       label="View"   onClick={() => setDetailEvo(evo)} />
-        <ActionBtn icon={<RefreshCw size={10} />} label="Status" onClick={() => setChangeStatusEvo(evo)} color={EVCORE_COLORS.blue} />
-        <ActionBtn icon={<Trash2 size={10} />}    label="Delete" onClick={() => setDeleteEvo(evo)} color={EVCORE_COLORS.danger} />
+        <RowActionBtn icon={<Eye size={14} />}       title="View"          onClick={() => setDetailEvo(evo)} variant="green" />
+        <RowActionBtn icon={<RefreshCw size={14} />} title="Change status" onClick={() => setChangeStatusEvo(evo)} variant="blue" />
+        <RowActionBtn icon={<Trash2 size={14} />}    title="Delete"        onClick={() => setDeleteEvo(evo)} variant="danger" />
       </div>
     );
   };

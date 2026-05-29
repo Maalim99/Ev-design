@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Zap, MapPin, Users, Maximize2, Minimize2, Eye } from "lucide-react";
+import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { Map, MapMarker, MarkerContent, MarkerPopup, MapControls } from "@/components/ui/map";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
@@ -102,12 +103,7 @@ export default function EmcsPage() {
   const rowActions = (row: Record<string, number | string | React.ReactNode | object>) => {
     const emc = (row._raw as typeof DUMMY_EMCS[0]);
     return (
-      <button
-        onClick={() => router.push(`/emcs/${emc.code}`)}
-        style={{ display: "inline-flex", alignItems: "center", gap: 4, height: 26, padding: "0 9px", borderRadius: 6, border: `0.5px solid ${EVCORE_COLORS.border}`, backgroundColor: "transparent", fontSize: 11, fontWeight: 500, color: EVCORE_COLORS.textSecondary, cursor: "pointer" }}
-      >
-        <Eye size={10} /> View
-      </button>
+      <RowActionBtn icon={<Eye size={14} />} title="View EMC" onClick={() => router.push(`/emcs/${emc.code}`)} variant="green" />
     );
   };
 
