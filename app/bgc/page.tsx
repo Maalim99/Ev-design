@@ -28,7 +28,7 @@ import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 const BGC_AGENTS    = ["Jean-Pierre Ndinga", "Patience Wa Mwila", "Ambroise Kabong"];
 
 const STATUS_CHIP: Record<BgcTaskStatus, { type: StatusChipType; label: string }> = {
-  UNASSIGNED: { type: StatusChipType.Normal,  label: "Unassigned" },
+  NOT_YET_ASSIGNED: { type: StatusChipType.Normal,  label: "Not Yet Assigned" },
   ASSIGNED:   { type: StatusChipType.Accent,  label: "Assigned"   },
   SUBMITTED:  { type: StatusChipType.Info,    label: "Submitted"  },
   APPROVED:   { type: StatusChipType.Success, label: "Approved"   },
@@ -194,7 +194,7 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
       </div>
 
       {/* Footer actions — UNASSIGNED and SUBMITTED only; all others use the X button to close */}
-      {task.status === "UNASSIGNED" && (
+      {task.status === "NOT_YET_ASSIGNED" && (
         <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 16, borderTop: `0.5px solid ${EVCORE_COLORS.border}` }}>
           <button onClick={() => { onClose(); onAssign(); }} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: "none", backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer" }}>Assign AAROVE Agent</button>
         </div>
@@ -353,13 +353,13 @@ export default function BgcPage() {
   const [rejectTask,  setRejectTask]  = React.useState<BgcTask | null>(null);
   const [returnTask,  setReturnTask]  = React.useState<BgcTask | null>(null);
 
-  const unassignedCt = BGC_TASKS.filter(t => t.status === "UNASSIGNED").length;
+  const unassignedCt = BGC_TASKS.filter(t => t.status === "NOT_YET_ASSIGNED").length;
   const assignedCt   = BGC_TASKS.filter(t => t.status === "ASSIGNED").length;
   const submittedCt  = BGC_TASKS.filter(t => t.status === "SUBMITTED").length;
   const approvedMtd  = BGC_TASKS.filter(t => t.status === "APPROVED" && t.completedAt?.startsWith("2026-05")).length;
 
   const STATUS_SORT: Record<BgcTaskStatus, number> = {
-    UNASSIGNED: 0, SUBMITTED: 1, REJECTED: 2, RETURNED: 3, ASSIGNED: 4, APPROVED: 5,
+    NOT_YET_ASSIGNED: 0, SUBMITTED: 1, REJECTED: 2, RETURNED: 3, ASSIGNED: 4, APPROVED: 5,
   };
 
   const applyFilter = React.useCallback((value: string | null | undefined, f: { method: string; value: string }) => {
@@ -376,7 +376,7 @@ export default function BgcPage() {
 
   const filtered = React.useMemo(() => {
     let list = BGC_TASKS;
-    if (view === "my") list = list.filter(t => t.status === "UNASSIGNED" || t.status === "SUBMITTED");
+    if (view === "my") list = list.filter(t => t.status === "NOT_YET_ASSIGNED" || t.status === "SUBMITTED");
     return list
       .filter(t =>
         applyFilter(t.evoName,            filterData.evoName           ?? { method: Method.Contains, value: "" }) &&
@@ -439,7 +439,7 @@ export default function BgcPage() {
   const rowActions = (row: Record<string, number | string | React.ReactNode | object>) => {
     const t = row._raw as BgcTask;
     const secondSlot =
-      t.status === "UNASSIGNED" ? (
+      t.status === "NOT_YET_ASSIGNED" ? (
         <RowActionBtn icon={<UserPlus size={15} />} title="Assign AAROVE agent" onClick={() => setAssignTask(t)} variant="blue" />
       ) : t.status === "SUBMITTED" ? (
         <RowActionBtn icon={<ClipboardCheck size={15} />} title="Review BGC" onClick={() => setViewTask(t)} variant="green" />
@@ -467,7 +467,7 @@ export default function BgcPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-            <KpiCard label="Unassigned"   value={String(unassignedCt)} delta="Needs AAROVE"      deltaType="negative" icon={Clock} />
+            <KpiCard label="Not Yet Assigned"   value={String(unassignedCt)} delta="Needs AAROVE"      deltaType="negative" icon={Clock} />
             <KpiCard label="In Progress"  value={String(assignedCt)}   delta="Active field work" deltaType="neutral"  icon={AlertCircle} />
             <KpiCard label="Submitted"    value={String(submittedCt)}  delta="Awaiting review"   deltaType="neutral"  icon={FileCheck} />
             <KpiCard label="Approved MTD" value={String(approvedMtd)}  delta="May 2026"           deltaType="positive" icon={CheckCircle2} />

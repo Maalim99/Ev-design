@@ -493,9 +493,9 @@ export default function EmcDetailPage() {
 
   const evoStatusOptions: { value: string; label: string }[] = [
     { value: "ALL", label: "All" },
-    { value: "AWAITING_BGC", label: "Awaiting BGC" },
-    { value: "AWAITING_TRAINING", label: "Awaiting Training" },
-    { value: "AWAITING_PAYMENT", label: "Awaiting Payment" },
+    { value: "PENDING_BGC", label: "Awaiting BGC" },
+    { value: "PENDING_OSP", label: "Awaiting Training" },
+    { value: "PENDING_RP", label: "Awaiting Payment" },
     { value: "ACTIVE", label: "Active" },
     { value: "INACTIVE", label: "Inactive" },
   ];

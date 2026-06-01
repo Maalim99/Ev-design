@@ -21,11 +21,11 @@ export interface EvoFilterSection {
 // ─── Options ──────────────────────────────────────────────────────────────────
 
 const EVO_STATUS_OPTIONS: DropdownOption[] = [
-  { id: "AWAITING_BGC",      name: "Awaiting BGC" },
-  { id: "AWAITING_TRAINING", name: "Awaiting Training" },
-  { id: "AWAITING_PAYMENT",  name: "Awaiting Payment" },
-  { id: "PARTIAL_PAYMENT",   name: "Partial Payment" },
-  { id: "AWAITING_HANDOVER", name: "Awaiting Handover" },
+  { id: "PENDING_BGC",      name: "Pending BGC" },
+  { id: "PENDING_OSP", name: "Pending OSP" },
+  { id: "PENDING_RP",  name: "Pending RP" },
+  { id: "PARTIAL_RP",   name: "Partial RP" },
+  { id: "PENDING_HO", name: "Pending HO" },
   { id: "ACTIVE",            name: "Active" },
   { id: "INACTIVE",          name: "Inactive" },
   { id: "DISENGAGED",        name: "Disengaged" },

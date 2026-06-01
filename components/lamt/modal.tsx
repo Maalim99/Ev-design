@@ -29,7 +29,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       <Dialog open={opened} onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           ref={ref}
-          className={cn("rounded-lg p-[15px]", className)}
+          className={cn("rounded-lg p-[15px] max-h-[90vh] overflow-y-auto", className)}
           style={{ maxWidth: `${maxWidth}px` }}
         >
           <DialogHeader>

@@ -5,7 +5,7 @@ import type { EvoFormFilterSection } from "@/components/evcore/filters/EvoFormFi
 // ─── Options ──────────────────────────────────────────────────────────────────
 
 const BGC_STATUS_OPTIONS: DropdownOption[] = [
-  { id: "UNASSIGNED", name: "Unassigned" },
+  { id: "NOT_YET_ASSIGNED", name: "Not Yet Assigned" },
   { id: "ASSIGNED",   name: "Assigned"   },
   { id: "SUBMITTED",  name: "Submitted"  },
   { id: "APPROVED",   name: "Approved"   },

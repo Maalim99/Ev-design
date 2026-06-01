@@ -191,11 +191,14 @@ export const PaginationDropdown = React.forwardRef<
               borderRadius: "7px",
               backgroundColor: "white",
               marginTop: "0",
+              position: "relative",
             }),
             menuList: (base) => ({
               ...base,
               padding: "0",
               borderRadius: "7px",
+              maxHeight: "160px",
+              overflowY: "auto",
             }),
             dropdownIndicator: (base, state) => ({
               ...base,

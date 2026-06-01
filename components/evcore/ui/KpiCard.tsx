@@ -73,7 +73,7 @@ export function KpiCard({
       <div>
         <div
           style={{
-            fontSize: 30,
+            fontSize: value.length > 8 ? 16 : value.length > 5 ? 22 : 30,
             fontWeight: 700,
             color: EVCORE_COLORS.textPrimary,
             lineHeight: 1,

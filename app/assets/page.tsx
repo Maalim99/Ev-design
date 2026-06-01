@@ -6,7 +6,8 @@ import { Truck, Radio, Wrench, CircleDot, Eye } from "lucide-react";
 import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoFiltersDrawer } from "@/components/evcore/filters/EvoFiltersDrawer";
+import { useForm } from "react-hook-form";
+import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
@@ -17,7 +18,9 @@ import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { FLEET_ASSETS, EMC_BATTERIES, type AssetFleetStatus, type AssetEvType } from "@/data/dummy";
 import { RegisterAssetModal } from "@/components/evcore/modals/RegisterAssetModal";
 import { EVCORE_COLORS } from "@/lib/evcore/constants";
-import { ASSETS_FILTER_SECTIONS, ASSETS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { ASSETS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
+import { EVO_ASSETS_FILTER_SECTIONS, getAssetsFilterDefaults } from "@/lib/evcore/evoAssetsFilterSections";
+import { Method } from "@/lib/filter-utils";
 
 // ─── Shared maps ──────────────────────────────────────────────────────────────
 
@@ -46,7 +49,9 @@ function FleetStatusChip({ status }: { status: AssetFleetStatus }) {
 
 function FleetTab() {
   const router = useRouter();
-  const [filterValues, setFilterValues] = React.useState<Record<string, string[]>>({});
+  const formMethods = useForm({ defaultValues: getAssetsFilterDefaults() });
+
+  const [filterData,   setFilterData]   = React.useState(getAssetsFilterDefaults());
   const [columns,      setColumns]      = React.useState<ColumnPref[]>(ASSETS_DEFAULT_COLUMNS);
   const [filtersOpen,  setFiltersOpen]  = React.useState(false);
   const [prefsOpen,    setPrefsOpen]    = React.useState(false);
@@ -58,21 +63,39 @@ function FleetTab() {
   const available = FLEET_ASSETS.filter(a => a.status === "OFF_ROAD_IDLE").length;
   const faulty    = FLEET_ASSETS.filter(a => a.status === "OFF_ROAD_FAULTY").length;
 
-  const filtered = React.useMemo(() => {
-    const statuses = filterValues.status ?? [];
-    const types    = filterValues.evType ?? [];
-    const emcs     = filterValues.emc    ?? [];
-    return FLEET_ASSETS.filter(a =>
-      (!statuses.length || statuses.includes(a.status as string)) &&
-      (!types.length    || types.includes(a.evType as string)) &&
-      (!emcs.length     || emcs.includes(a.emcName))
-    );
-  }, [filterValues]);
+  const applyFilter = React.useCallback((value: string | null | undefined, f: { method: string; value: string }) => {
+    if (!f.value) return true;
+    const v  = String(value ?? "").toLowerCase();
+    const fv = f.value.toLowerCase();
+    switch (f.method) {
+      case Method.Contains:       return v.includes(fv);
+      case Method.DoesNotContain: return !v.includes(fv);
+      case Method.Equals:         return v === fv;
+      default:                    return true;
+    }
+  }, []);
 
-  const activeFiltersCount = Object.values(filterValues).reduce((a, v) => a + v.length, 0);
-  const handleFilterChange = (id: string, selected: string[]) => { setFilterValues(p => ({ ...p, [id]: selected })); setPage(1); };
-  const handleFilterReset  = () => { setFilterValues({}); setPage(1); };
-  const handleColumnReset  = () => setColumns(ASSETS_DEFAULT_COLUMNS);
+  const filtered = React.useMemo(() => {
+    const fd = filterData;
+    return FLEET_ASSETS.filter(a =>
+      applyFilter(a.assetCode,                    fd.assetCode      ?? { method: Method.Contains, value: "" }) &&
+      applyFilter(a.assetKey,                     fd.assetKey       ?? { method: Method.Contains, value: "" }) &&
+      applyFilter(a.invoiceNumber,                fd.invoiceNumber  ?? { method: Method.Contains, value: "" }) &&
+      applyFilter(a.productCode,                  fd.productCode    ?? { method: Method.Equals,   value: "" }) &&
+      applyFilter(a.evType,                       fd.evType         ?? { method: Method.Equals,   value: "" }) &&
+      applyFilter(a.status,                       fd.status         ?? { method: Method.Equals,   value: "" }) &&
+      applyFilter(a.emcName,                      fd.emcName        ?? { method: Method.Equals,   value: "" }) &&
+      applyFilter(a.assignedEvoCode ?? "",        fd.assignedEvoCode?? { method: Method.Contains, value: "" })
+    );
+  }, [filterData, applyFilter]);
+
+  const activeFiltersCount = Object.values(filterData).filter(f => f.value).length;
+  const onChangeFilter     = React.useCallback((values: Record<string, unknown>) => {
+    setFilterData(prev => ({ ...prev, ...(values as Record<string, { method: string; value: string }>) }));
+    setPage(1);
+  }, []);
+  const handleFilterReset = () => { const d = getAssetsFilterDefaults(); setFilterData(d); formMethods.reset(d); setPage(1); };
+  const handleColumnReset = () => setColumns(ASSETS_DEFAULT_COLUMNS);
 
   const visibleKeys = new Set(columns.filter(c => c.visible).map(c => c.key));
   type AssetRow = typeof FLEET_ASSETS[0];
@@ -128,6 +151,7 @@ function FleetTab() {
           activeFiltersCount={activeFiltersCount}
           onClickFilter={() => setFiltersOpen(true)}
           onClickPreferences={() => setPrefsOpen(true)}
+          onClearFilter={activeFiltersCount > 0 ? handleFilterReset : undefined}
         />
 
         <div style={{ backgroundColor: EVCORE_COLORS.white, border: `0.5px solid ${EVCORE_COLORS.border}`, borderRadius: 12, overflow: "hidden" }}>
@@ -138,10 +162,12 @@ function FleetTab() {
       </div>
 
       <RegisterAssetModal opened={registerOpen} onClose={() => setRegisterOpen(false)} />
-      <EvoFiltersDrawer
+      <EvoFormFiltersDrawer
         opened={filtersOpen} onClose={() => setFiltersOpen(false)}
-        sections={ASSETS_FILTER_SECTIONS} values={filterValues}
-        onChange={handleFilterChange} onReset={handleFilterReset}
+        sections={EVO_ASSETS_FILTER_SECTIONS}
+        formControl={formMethods}
+        onChangeFilter={onChangeFilter}
+        onResetAll={handleFilterReset}
       />
       <EvoPreferencesDrawer
         opened={prefsOpen} onClose={() => setPrefsOpen(false)}

@@ -30,11 +30,11 @@ export const ACTIVITY_DOT_COLORS = {
 // ─── EVO status ──────────────────────────────────────────────────────────────
 
 export const EVO_STATUS_LABELS: Record<EvoStatus, string> = {
-  AWAITING_BGC:      "Awaiting BGC",
-  AWAITING_TRAINING: "Awaiting Training",
-  AWAITING_PAYMENT:  "Awaiting Payment",
-  PARTIAL_PAYMENT:   "Partial Payment",
-  AWAITING_HANDOVER: "Awaiting Handover",
+  PENDING_BGC:      "Pending BGC",
+  PENDING_OSP: "Pending OSP",
+  PENDING_RP:  "Pending RP",
+  PARTIAL_RP:   "Partial RP",
+  PENDING_HO: "Pending HO",
   ACTIVE:            "Active",
   INACTIVE:          "Inactive",
   DISENGAGED:        "Disengaged",
@@ -42,23 +42,23 @@ export const EVO_STATUS_LABELS: Record<EvoStatus, string> = {
 
 export const EVO_STATUS_STYLES: Record<EvoStatus, { bg: string; text: string }> = {
   ACTIVE:            { bg: "#E1F5EE", text: "#0F6E56" },
-  AWAITING_BGC:      { bg: "#FAEEDA", text: "#854F0B" },
-  AWAITING_TRAINING: { bg: "#E6F1FB", text: "#185FA5" },
-  AWAITING_PAYMENT:  { bg: "#F0EAFB", text: "#5B21B6" },
-  PARTIAL_PAYMENT:   { bg: "#E0F2F1", text: "#00695C" },
-  AWAITING_HANDOVER: { bg: "#EEF2FF", text: "#3730A3" },
+  PENDING_BGC:      { bg: "#FAEEDA", text: "#854F0B" },
+  PENDING_OSP: { bg: "#E6F1FB", text: "#185FA5" },
+  PENDING_RP:  { bg: "#F0EAFB", text: "#5B21B6" },
+  PARTIAL_RP:   { bg: "#E0F2F1", text: "#00695C" },
+  PENDING_HO: { bg: "#EEF2FF", text: "#3730A3" },
   INACTIVE:          { bg: "#F3F3F1", text: "#6B7280" },
   DISENGAGED:        { bg: "#FEE2E2", text: "#991B1B" },
 };
 
 // Allowed status transitions
 export const EVO_STATUS_TRANSITIONS: Record<EvoStatus, EvoStatus[]> = {
-  AWAITING_BGC:      ["AWAITING_TRAINING", "DISENGAGED"],
-  AWAITING_TRAINING: ["AWAITING_PAYMENT",  "DISENGAGED"],
-  AWAITING_PAYMENT:  ["PARTIAL_PAYMENT", "AWAITING_HANDOVER", "DISENGAGED"],
-  PARTIAL_PAYMENT:   ["AWAITING_PAYMENT", "AWAITING_HANDOVER", "DISENGAGED"],
-  AWAITING_HANDOVER: ["ACTIVE",            "DISENGAGED"],
+  PENDING_BGC:      ["PENDING_OSP", "DISENGAGED"],
+  PENDING_OSP: ["PENDING_RP",  "DISENGAGED"],
+  PENDING_RP:  ["PARTIAL_RP", "PENDING_HO", "DISENGAGED"],
+  PARTIAL_RP:   ["PENDING_RP", "PENDING_HO", "DISENGAGED"],
+  PENDING_HO: ["ACTIVE",            "DISENGAGED"],
   ACTIVE:            ["INACTIVE",          "DISENGAGED"],
   INACTIVE:          ["ACTIVE",            "DISENGAGED"],
-  DISENGAGED:        ["AWAITING_BGC"],
+  DISENGAGED:        ["PENDING_BGC"],
 };

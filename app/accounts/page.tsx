@@ -39,11 +39,11 @@ import { ACCOUNTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
 
 const EVO_STATUS_CHIP: Record<string, { type: StatusChipType; label: string }> = {
   ACTIVE:            { type: StatusChipType.Success, label: "Active"            },
-  AWAITING_BGC:      { type: StatusChipType.Warning, label: "Awaiting BGC"      },
-  AWAITING_TRAINING: { type: StatusChipType.Accent,  label: "Awaiting Training" },
-  AWAITING_PAYMENT:  { type: StatusChipType.Info,    label: "Awaiting Payment"  },
-  PARTIAL_PAYMENT:   { type: StatusChipType.AccentM, label: "Partial Payment"   },
-  AWAITING_HANDOVER: { type: StatusChipType.AccentM, label: "Awaiting Handover" },
+  PENDING_BGC:      { type: StatusChipType.Warning, label: "Pending BGC"      },
+  PENDING_OSP: { type: StatusChipType.Accent,  label: "Pending OSP" },
+  PENDING_RP:  { type: StatusChipType.Info,    label: "Pending RP"  },
+  PARTIAL_RP:   { type: StatusChipType.AccentM, label: "Partial RP"   },
+  PENDING_HO: { type: StatusChipType.AccentM, label: "Pending HO" },
   INACTIVE:          { type: StatusChipType.Normal,  label: "Inactive"          },
   DISENGAGED:        { type: StatusChipType.Danger,  label: "Disengaged"        },
 };
@@ -176,7 +176,7 @@ function ChangeStatusModal({ evo, onClose }: { evo: EvoAccount | null; onClose: 
 function AssignAssetModal({ evo, onClose }: { evo: EvoAccount | null; onClose: () => void }) {
   const [assetId, setAssetId] = React.useState("");
   if (!evo) return null;
-  const eligible = evo.status === "AWAITING_HANDOVER" || evo.status === "ACTIVE";
+  const eligible = evo.status === "PENDING_HO" || evo.status === "ACTIVE";
   const available = FLEET_ASSETS.filter(a => a.emcName === evo.emcName && a.status === "OFF_ROAD_IDLE");
 
   return (
@@ -232,7 +232,7 @@ function GlobalAssignModal({ opened, onClose }: { opened: boolean; onClose: () =
   if (!opened) return null;
 
   const selectedEvo = EVO_ACCOUNTS.find(e => e.id === selectedEvoId) ?? null;
-  const eligible    = selectedEvo && (selectedEvo.status === "AWAITING_HANDOVER" || selectedEvo.status === "ACTIVE");
+  const eligible    = selectedEvo && (selectedEvo.status === "PENDING_HO" || selectedEvo.status === "ACTIVE");
   const available   = selectedEvo ? FLEET_ASSETS.filter(a => a.emcName === selectedEvo.emcName && a.status === "OFF_ROAD_IDLE") : [];
 
   return (
@@ -354,7 +354,7 @@ export default function EvoAccountsPage() {
   const todayStr      = new Date().toISOString().slice(0, 10);
   const totalAccounts = EVO_ACCOUNTS.length;
   const activeCount   = EVO_ACCOUNTS.filter(e => e.status === "ACTIVE").length;
-  const bgcCount      = EVO_ACCOUNTS.filter(e => e.status === "AWAITING_BGC").length;
+  const bgcCount      = EVO_ACCOUNTS.filter(e => e.status === "PENDING_BGC").length;
   const todayCount    = EVO_ACCOUNTS.filter(e => e.registeredAt === todayStr).length;
 
   // ── Filtered data ───────────────────────────────────────────────────────────

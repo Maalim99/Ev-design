@@ -91,7 +91,7 @@ export const Dropdown = React.forwardRef<HTMLButtonElement, DropdownProps>(
             "rounded-[5px]",
             "p-2",
             "shadow-[0_5px_30px_rgba(0,0,0,0.15)]",
-            "max-h-[400px]",
+            "max-h-[220px]",
             "overflow-auto"
           )}
         >

@@ -19,11 +19,11 @@ export const ACCOUNTS_FILTER_SECTIONS: FilterSection[] = [
   {
     id: "status", label: "Status",
     options: [
-      { id: "AWAITING_BGC",      name: "Awaiting BGC" },
-      { id: "AWAITING_TRAINING", name: "Awaiting Training" },
-      { id: "AWAITING_PAYMENT",  name: "Awaiting Payment" },
-      { id: "PARTIAL_PAYMENT",   name: "Partial Payment" },
-      { id: "AWAITING_HANDOVER", name: "Awaiting Handover" },
+      { id: "PENDING_BGC",      name: "Pending BGC" },
+      { id: "PENDING_OSP", name: "Pending OSP" },
+      { id: "PENDING_RP",  name: "Pending RP" },
+      { id: "PARTIAL_RP",   name: "Partial RP" },
+      { id: "PENDING_HO", name: "Pending HO" },
       { id: "ACTIVE",            name: "Active" },
       { id: "INACTIVE",          name: "Inactive" },
       { id: "DISENGAGED",        name: "Disengaged" },
@@ -106,7 +106,7 @@ export const BGC_FILTER_SECTIONS: FilterSection[] = [
   {
     id: "status", label: "Status",
     options: [
-      { id: "UNASSIGNED", name: "Unassigned" },
+      { id: "NOT_YET_ASSIGNED", name: "Not Yet Assigned" },
       { id: "ASSIGNED",   name: "Assigned" },
       { id: "SUBMITTED",  name: "Submitted" },
       { id: "APPROVED",   name: "Approved" },
@@ -160,25 +160,34 @@ export const EMCS_DEFAULT_COLUMNS: ColumnPref[] = [
 
 export const OSP_FILTER_SECTIONS: FilterSection[] = [
   {
-    id: "status", label: "OSP Status",
+    id: "taskStatus", label: "Task Status",
     options: [
-      { id: "NOT_STARTED", name: "Not Started" },
-      { id: "IN_PROGRESS", name: "In Progress" },
-      { id: "PASSED",      name: "Passed" },
-      { id: "FAILED",      name: "Failed" },
+      { id: "NOT_YET_ASSIGNED", name: "Pending Assignment" },
+      { id: "ASSIGNED",         name: "Assigned" },
+      { id: "IN_TRAINING",      name: "In Training" },
+      { id: "CERTIFIED",        name: "Certified" },
+      { id: "FAILED",           name: "Failed" },
+    ],
+  },
+  {
+    id: "trainer", label: "Trainer",
+    options: [
+      { id: "Félicité Mbuyi",    name: "Félicité Mbuyi"    },
+      { id: "Grégoire Kabamba",  name: "Grégoire Kabamba"  },
+      { id: "Ambroise Kabong",   name: "Ambroise Kabong"   },
     ],
   },
   { id: "emc", label: "EMC Zone", options: EMC_FILTER_OPTIONS },
 ];
 
 export const OSP_DEFAULT_COLUMNS: ColumnPref[] = [
-  { key: "evoCode",  label: "EVO Code",  visible: true, required: true },
-  { key: "fullName", label: "Full Name", visible: true },
-  { key: "emc",      label: "EMC",       visible: true },
-  { key: "status",   label: "OSP Status",visible: true },
-  { key: "written",  label: "Written",   visible: true },
-  { key: "onroad",   label: "On-Road",   visible: true },
-  { key: "result",   label: "Result",    visible: false },
+  { key: "evo",         label: "EVO",            visible: true,  required: true },
+  { key: "emc",         label: "EMC",            visible: true  },
+  { key: "trainer",     label: "Trainer",        visible: true  },
+  { key: "trainingDate",label: "Training Date",  visible: true  },
+  { key: "written",     label: "Written /100",   visible: true  },
+  { key: "onroad",      label: "On-Road /100",   visible: true  },
+  { key: "status",      label: "Status",         visible: true  },
 ];
 
 // ─── Payments ─────────────────────────────────────────────────────────────────
@@ -235,9 +244,13 @@ export const PLANS_FILTER_SECTIONS: FilterSection[] = [
   {
     id: "product", label: "Product",
     options: [
-      { id: "ALTECH-F3-2B",   name: "ALTECH-F3-2B" },
-      { id: "ALTECH-E3-2B",   name: "ALTECH-E3-2B" },
-      { id: "ALTECH-T1-2B",   name: "ALTECH-T1-2B" },
+      { id: "ALTECH-EMMO-A1", name: "ALTECH-EMMO-A1" },
+      { id: "ALTECH-EPAT-A1", name: "ALTECH-EPAT-A1" },
+      { id: "ALTECH-F3-2B",   name: "ALTECH-F3-2B"   },
+      { id: "ALTECH-E3-2B",   name: "ALTECH-E3-2B"   },
+      { id: "ALTECH-T1-2B",   name: "ALTECH-T1-2B"   },
+      { id: "ALTECH-T2-2B",   name: "ALTECH-T2-2B"   },
+      { id: "ALTECH-T3-2B",   name: "ALTECH-T3-2B"   },
       { id: "ALTECH-ECAT-A1", name: "ALTECH-ECAT-A1" },
     ],
   },

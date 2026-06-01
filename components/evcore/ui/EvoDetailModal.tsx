@@ -14,11 +14,11 @@ import type { EvoAccount, EvoStatus, BgcDecision, OspStatus } from "@/data/dummy
 // ─── Contextual action config per status ────────────────────────────────────
 
 const ACTION_CONFIG: Record<EvoStatus, { label: string; color: string; hoverColor: string } | null> = {
-  AWAITING_BGC:      { label: "Submit for BGC",        color: EVCORE_COLORS.green, hoverColor: "#179060" },
-  AWAITING_TRAINING: { label: "Schedule Training",     color: EVCORE_COLORS.amber, hoverColor: "#d4891f" },
-  AWAITING_PAYMENT:  { label: "Record Payment",        color: EVCORE_COLORS.green, hoverColor: "#179060" },
-  PARTIAL_PAYMENT:   { label: "Complete Payment",      color: EVCORE_COLORS.green, hoverColor: "#179060" },
-  AWAITING_HANDOVER: { label: "Proceed to Handover",   color: EVCORE_COLORS.green, hoverColor: "#179060" },
+  PENDING_BGC:      { label: "Submit for BGC",        color: EVCORE_COLORS.green, hoverColor: "#179060" },
+  PENDING_OSP: { label: "Schedule Training",     color: EVCORE_COLORS.amber, hoverColor: "#d4891f" },
+  PENDING_RP:  { label: "Record Payment",        color: EVCORE_COLORS.green, hoverColor: "#179060" },
+  PARTIAL_RP:   { label: "Complete Payment",      color: EVCORE_COLORS.green, hoverColor: "#179060" },
+  PENDING_HO: { label: "Proceed to Handover",   color: EVCORE_COLORS.green, hoverColor: "#179060" },
   ACTIVE:            { label: "Suspend Account",       color: EVCORE_COLORS.amber, hoverColor: "#d4891f" },
   INACTIVE:          { label: "Reactivate",            color: EVCORE_COLORS.green, hoverColor: "#179060" },
   DISENGAGED:        { label: "Request Re-evaluation", color: EVCORE_COLORS.blue,  hoverColor: "#2c70b8" },

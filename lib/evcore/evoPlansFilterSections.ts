@@ -26,9 +26,13 @@ const PLAN_STATUS_OPTIONS: DropdownOption[] = [
 ];
 
 const PRODUCT_CODE_OPTIONS: DropdownOption[] = [
-  { id: "ALTECH-F3-2B",   name: "ALTECH-F3-2B" },
-  { id: "ALTECH-E3-2B",   name: "ALTECH-E3-2B" },
-  { id: "ALTECH-T1-2B",   name: "ALTECH-T1-2B" },
+  { id: "ALTECH-EMMO-A1", name: "ALTECH-EMMO-A1" },
+  { id: "ALTECH-EPAT-A1", name: "ALTECH-EPAT-A1" },
+  { id: "ALTECH-F3-2B",   name: "ALTECH-F3-2B"   },
+  { id: "ALTECH-E3-2B",   name: "ALTECH-E3-2B"   },
+  { id: "ALTECH-T1-2B",   name: "ALTECH-T1-2B"   },
+  { id: "ALTECH-T2-2B",   name: "ALTECH-T2-2B"   },
+  { id: "ALTECH-T3-2B",   name: "ALTECH-T3-2B"   },
   { id: "ALTECH-ECAT-A1", name: "ALTECH-ECAT-A1" },
 ];
 
