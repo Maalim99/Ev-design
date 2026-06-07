@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Eye, RefreshCw, Trash2, Download } from "lucide-react";
 import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { Users, ClipboardCheck, CheckCircle2, CalendarPlus } from "lucide-react";
@@ -11,6 +12,7 @@ import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { EvoStatusChip } from "@/components/evcore/ui/EvoStatusChip";
 import { EvoDetailModal, DeleteConfirmModal } from "@/components/evcore/ui/EvoDetailModal";
 import { RegisterEvoModal } from "@/components/evcore/modals/RegisterEvoModal";
+import { EditEvoModal } from "@/components/evcore/modals/EditEvoModal";
 import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
 import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
 import { PageHeader } from "@/components/lamt/page-header";
@@ -314,8 +316,10 @@ function DownloadModal({ opened, onClose, columns }: { opened: boolean; onClose:
 
 export default function EvoAccountsPage() {
   // ── Modal state ─────────────────────────────────────────────────────────────
+  const router = useRouter();
   const [registerOpen,     setRegisterOpen]     = React.useState(false);
   const [detailEvo,        setDetailEvo]        = React.useState<EvoAccount | null>(null);
+  const [editEvo,          setEditEvo]          = React.useState<EvoAccount | null>(null);
   const [changeStatusEvo,  setChangeStatusEvo]  = React.useState<EvoAccount | null>(null);
   const [assignEvo,        setAssignEvo]        = React.useState<EvoAccount | null>(null);
   const [deleteEvo,        setDeleteEvo]        = React.useState<EvoAccount | null>(null);
@@ -475,9 +479,9 @@ export default function EvoAccountsPage() {
     const evo = row._raw as EvoAccount;
     return (
       <div style={{ display: "flex", gap: 4 }}>
-        <RowActionBtn icon={<Eye size={14} />}       title="View"          onClick={() => setDetailEvo(evo)} variant="green" />
-        <RowActionBtn icon={<RefreshCw size={14} />} title="Change status" onClick={() => setChangeStatusEvo(evo)} variant="blue" />
-        <RowActionBtn icon={<Trash2 size={14} />}    title="Delete"        onClick={() => setDeleteEvo(evo)} variant="danger" />
+        <RowActionBtn icon={<Eye size={14} />}       title="View"          onClick={() => router.push(`/accounts/${evo.id}`)} variant="green" />
+        <RowActionBtn icon={<RefreshCw size={14} />} title="Change status" onClick={() => setChangeStatusEvo(evo)} variant="blue"  />
+        <RowActionBtn icon={<Trash2 size={14} />}    title="Delete"        onClick={() => setDeleteEvo(evo)}       variant="danger" />
       </div>
     );
   };
@@ -535,6 +539,7 @@ export default function EvoAccountsPage() {
       {/* Modals */}
       <RegisterEvoModal opened={registerOpen} onClose={() => setRegisterOpen(false)} title="Register New EVO" maxWidth={680} />
       <EvoDetailModal evo={detailEvo} onClose={() => setDetailEvo(null)} />
+      <EditEvoModal   evo={editEvo}   onClose={() => setEditEvo(null)} />
       <ChangeStatusModal evo={changeStatusEvo} onClose={() => setChangeStatusEvo(null)} />
       <AssignAssetModal  evo={assignEvo}       onClose={() => setAssignEvo(null)} />
       {deleteEvo && <DeleteConfirmModal evo={deleteEvo} onConfirm={() => setDeleteEvo(null)} onCancel={() => setDeleteEvo(null)} />}

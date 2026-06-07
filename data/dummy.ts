@@ -399,10 +399,22 @@ export interface RentalPlan {
 }
 
 export const RENTAL_PLANS: RentalPlan[] = [
-  { code: "SF5.RF6.RP36",  name: "E3 Standard 36M",   productCode: "ALTECH-E3-2B",   subscriptionFee: 5, dailyRentalFee: 6,  sundayRentalFee: 4, rentalPeriodMonths: 36, totalContractValue: 6197,  isActive: true  },
-  { code: "SF5.RF7.RP36",  name: "F3 Premium 36M",    productCode: "ALTECH-F3-2B",   subscriptionFee: 5, dailyRentalFee: 7,  sundayRentalFee: 5, rentalPeriodMonths: 36, totalContractValue: 7277,  isActive: true  },
-  { code: "SF6.RF8.RP36",  name: "Tricycle T1 36M",   productCode: "ALTECH-T1-2B",   subscriptionFee: 6, dailyRentalFee: 8,  sundayRentalFee: 6, rentalPeriodMonths: 36, totalContractValue: 8358,  isActive: true  },
-  { code: "SF8.RF10.RP24", name: "Cart Standard 24M", productCode: "ALTECH-ECAT-A1", subscriptionFee: 8, dailyRentalFee: 10, sundayRentalFee: 8, rentalPeriodMonths: 24, totalContractValue: 7016,  isActive: true  },
+  // 2-Wheeler plans
+  { code: "SF5.RF6.RP36",  name: "E3 Standard 36M",    productCode: "ALTECH-E3-2B",   subscriptionFee: 5,  dailyRentalFee: 6,  sundayRentalFee: 4,  rentalPeriodMonths: 36, totalContractValue: 6197,  isActive: true  },
+  { code: "SF5.RF7.RP36",  name: "F3 Premium 36M",     productCode: "ALTECH-F3-2B",   subscriptionFee: 5,  dailyRentalFee: 7,  sundayRentalFee: 5,  rentalPeriodMonths: 36, totalContractValue: 7277,  isActive: true  },
+  { code: "SF5.RF6.RP24",  name: "E3 Short 24M",       productCode: "ALTECH-E3-2B",   subscriptionFee: 5,  dailyRentalFee: 6,  sundayRentalFee: 4,  rentalPeriodMonths: 24, totalContractValue: 4157,  isActive: true  },
+  { code: "SF4.RF5.RP36",  name: "EMMO Standard 36M",  productCode: "ALTECH-EMMO-A1", subscriptionFee: 4,  dailyRentalFee: 5,  sundayRentalFee: 3,  rentalPeriodMonths: 36, totalContractValue: 5144,  isActive: true  },
+  { code: "SF4.RF5.RP24",  name: "EMMO Short 24M",     productCode: "ALTECH-EMMO-A1", subscriptionFee: 4,  dailyRentalFee: 5,  sundayRentalFee: 3,  rentalPeriodMonths: 24, totalContractValue: 3464,  isActive: false },
+  { code: "SF5.RF6.RP48",  name: "EPAT Extended 48M",  productCode: "ALTECH-EPAT-A1", subscriptionFee: 5,  dailyRentalFee: 6,  sundayRentalFee: 4,  rentalPeriodMonths: 48, totalContractValue: 8237,  isActive: true  },
+  { code: "SF6.RF7.RP36",  name: "EPAT Premium 36M",   productCode: "ALTECH-EPAT-A1", subscriptionFee: 6,  dailyRentalFee: 7,  sundayRentalFee: 5,  rentalPeriodMonths: 36, totalContractValue: 7278,  isActive: false },
+  // 3-Wheeler plans
+  { code: "SF6.RF8.RP36",  name: "Tricycle T1 36M",    productCode: "ALTECH-T1-2B",   subscriptionFee: 6,  dailyRentalFee: 8,  sundayRentalFee: 6,  rentalPeriodMonths: 36, totalContractValue: 8358,  isActive: true  },
+  { code: "SF6.RF9.RP36",  name: "Tricycle T2 36M",    productCode: "ALTECH-T2-2B",   subscriptionFee: 6,  dailyRentalFee: 9,  sundayRentalFee: 7,  rentalPeriodMonths: 36, totalContractValue: 9438,  isActive: true  },
+  { code: "SF7.RF10.RP36", name: "Tricycle T3 36M",    productCode: "ALTECH-T3-2B",   subscriptionFee: 7,  dailyRentalFee: 10, sundayRentalFee: 8,  rentalPeriodMonths: 36, totalContractValue: 10519, isActive: true  },
+  { code: "SF6.RF8.RP24",  name: "Tricycle T1 Short",  productCode: "ALTECH-T1-2B",   subscriptionFee: 6,  dailyRentalFee: 8,  sundayRentalFee: 6,  rentalPeriodMonths: 24, totalContractValue: 5638,  isActive: false },
+  // Cart plans
+  { code: "SF8.RF10.RP24", name: "Cart Standard 24M",  productCode: "ALTECH-ECAT-A1", subscriptionFee: 8,  dailyRentalFee: 10, sundayRentalFee: 8,  rentalPeriodMonths: 24, totalContractValue: 7016,  isActive: true  },
+  { code: "SF8.RF12.RP36", name: "Cart Premium 36M",   productCode: "ALTECH-ECAT-A1", subscriptionFee: 8,  dailyRentalFee: 12, sundayRentalFee: 10, rentalPeriodMonths: 36, totalContractValue: 12536, isActive: true  },
 ];
 
 // ─── Battery Assets ────────────────────────────────────────────────────────────
