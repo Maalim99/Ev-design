@@ -22,14 +22,14 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock IntersectionObserver
-global.IntersectionObserver = vi.fn(() => ({
+globalThis.IntersectionObserver = vi.fn(() => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   unobserve: vi.fn(),
 }));
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn(() => ({
+globalThis.ResizeObserver = vi.fn(() => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   unobserve: vi.fn(),

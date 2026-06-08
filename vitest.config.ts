@@ -13,7 +13,14 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   resolve: {
-    tsconfigPaths: true,
+    alias: {
+      '@': path.resolve(dirname, '.'),
+      '@/components/lamt': path.resolve(dirname, './components/lamt'),
+      '@/components/evcore': path.resolve(dirname, './components/evcore'),
+      '@/components/ui': path.resolve(dirname, './components/ui'),
+      '@/lib': path.resolve(dirname, './lib'),
+      '@/data': path.resolve(dirname, './data'),
+    },
   },
   test: {
     environment: 'jsdom',
