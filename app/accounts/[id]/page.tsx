@@ -360,9 +360,9 @@ export default function EvoDetailPage() {
                     <Item label="Assigned To" value={bgcTask?.assignedTo ?? undefined} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <PhaseItem label="Operator residence"  complete={!!bgcTask?.phase1Complete} pass={bgcTask?.phase1Details?.livesAtAddress} />
-                    <PhaseItem label="Sponsor verification" complete={!!bgcTask?.phase2Complete} pass={bgcTask?.phase2Details?.recommendsEvo} />
-                    <PhaseItem label="Neighbor reputation"  complete={!!bgcTask?.phase3Complete} pass={bgcTask?.phase3Details?.reputation === "GOOD"} />
+                    <PhaseItem label="Operator residence"  complete={!!bgcTask?.phase1Complete} pass={bgcTask?.phase1Data?.operatorLivesHere} />
+                    <PhaseItem label="Sponsor verification" complete={!!bgcTask?.phase2Complete} pass={bgcTask?.phase2Data?.recommendsEvo} />
+                    <PhaseItem label="Neighbor reputation"  complete={!!bgcTask?.phase3Complete} pass={bgcTask?.phase3Data?.reputation === "GOOD"} />
                   </div>
                 </div>
               </Box>

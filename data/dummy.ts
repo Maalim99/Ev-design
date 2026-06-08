@@ -473,12 +473,66 @@ export const BGC_TASKS: BgcTask[] = [
     phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
     createdAt: "2026-02-14", completedAt: "2026-05-02"
   },
-  { id: "bgc10", evoId: "17", evoCode: "EVO-1017", evoName: "Esther Kalonga",     emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2026-02-12", completedAt: "2026-05-10" },
-  { id: "bgc14", evoId: "1",  evoCode: "EVO-1001", evoName: "Lukusa Bienvenu",    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 4 }, createdAt: "2026-01-04", completedAt: "2026-01-10" },
-  { id: "bgc15", evoId: "7",  evoCode: "EVO-1007", evoName: "Kalombo Kayumba",    emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", province: "Haut-Katanga", status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Patience Wa Mwila",   phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2025-11-15", completedAt: "2025-11-22" },
-  { id: "bgc16", evoId: "8",  evoCode: "EVO-1008", evoName: "Tshibanda Nkole",    emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 2 }, createdAt: "2025-10-08", completedAt: "2025-10-15" },
-  { id: "bgc17", evoId: "12", evoCode: "EVO-1012", evoName: "Kanda Luvuya",       emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2025-12-01", completedAt: "2025-12-08" },
-  { id: "bgc18", evoId: "16", evoCode: "EVO-1016", evoName: "Grace Mbuyi",        emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 4 }, createdAt: "2025-11-25", completedAt: "2025-12-02" },
+  {
+    id: "bgc10", evoId: "17", evoCode: "EVO-1017", evoName: "Esther Kalonga",
+    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-02-12T08:00:00Z", submittedAt: "2026-05-09T14:30:00Z", evaluatedBy: "Manager Kasongo", evaluatedAt: "2026-05-10T09:15:00Z", evaluationResult: "APPROVED", evaluationNotes: "All phases completed successfully.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 3, phase3Result: "OK" },
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2026-02-12", completedAt: "2026-05-10"
+  },
+  {
+    id: "bgc14", evoId: "1", evoCode: "EVO-1001", evoName: "Lukusa Bienvenu",
+    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-01-04T08:00:00Z", submittedAt: "2026-01-09T16:00:00Z", evaluatedBy: "Manager Kasongo", evaluatedAt: "2026-01-10T10:00:00Z", evaluationResult: "APPROVED", evaluationNotes: "Excellent verification results.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 4, phase3Result: "OK" },
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2026-01-04", completedAt: "2026-01-10"
+  },
+  {
+    id: "bgc15", evoId: "7", evoCode: "EVO-1007", evoName: "Kalombo Kayumba",
+    emcName: "Katanga EMC", emcCode: "EMC-KAT-001", province: "Haut-Katanga",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Patience Wa Mwila", assignedAt: "2025-11-15T08:00:00Z", submittedAt: "2025-11-21T15:30:00Z", evaluatedBy: "Manager Mbuyi", evaluatedAt: "2025-11-22T11:00:00Z", evaluationResult: "APPROVED", evaluationNotes: "Strong community endorsement.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK_T, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 3, phase3Result: "OK" },
+    phase1Location: LUB_LOCATION, phase2Location: LUB_LOCATION, phase3Location: LUB_LOCATION,
+    createdAt: "2025-11-15", completedAt: "2025-11-22"
+  },
+  {
+    id: "bgc16", evoId: "8", evoCode: "EVO-1008", evoName: "Tshibanda Nkole",
+    emcName: "Nord-Kivu", emcCode: "EMC-GOM-001", province: "Nord-Kivu",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Ambroise Kabong", assignedAt: "2025-10-08T08:00:00Z", submittedAt: "2025-10-14T17:00:00Z", evaluatedBy: "Manager Kabila", evaluatedAt: "2025-10-15T09:30:00Z", evaluationResult: "APPROVED", evaluationNotes: "Good reputation in community.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 2, phase3Result: "OK" },
+    phase1Location: GOM_LOCATION, phase2Location: GOM_LOCATION, phase3Location: GOM_LOCATION,
+    createdAt: "2025-10-08", completedAt: "2025-10-15"
+  },
+  {
+    id: "bgc17", evoId: "12", evoCode: "EVO-1012", evoName: "Kanda Luvuya",
+    emcName: "Nord-Kivu", emcCode: "EMC-GOM-001", province: "Nord-Kivu",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Ambroise Kabong", assignedAt: "2025-12-01T08:00:00Z", submittedAt: "2025-12-07T14:45:00Z", evaluatedBy: "Manager Kabila", evaluatedAt: "2025-12-08T10:15:00Z", evaluationResult: "APPROVED", evaluationNotes: "All verification points satisfied.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK_T, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 3, phase3Result: "OK" },
+    phase1Location: GOM_LOCATION, phase2Location: GOM_LOCATION, phase3Location: GOM_LOCATION,
+    createdAt: "2025-12-01", completedAt: "2025-12-08"
+  },
+  {
+    id: "bgc18", evoId: "16", evoCode: "EVO-1016", evoName: "Grace Mbuyi",
+    emcName: "Nord-Kivu", emcCode: "EMC-GOM-001", province: "Nord-Kivu",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Ambroise Kabong", assignedAt: "2025-11-25T08:00:00Z", submittedAt: "2025-12-01T16:20:00Z", evaluatedBy: "Manager Kabila", evaluatedAt: "2025-12-02T11:45:00Z", evaluationResult: "APPROVED", evaluationNotes: "Excellent community standing.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 4, phase3Result: "OK" },
+    phase1Location: GOM_LOCATION, phase2Location: GOM_LOCATION, phase3Location: GOM_LOCATION,
+    createdAt: "2025-11-25", completedAt: "2025-12-02"
+  },
   // REJECTED — auto-rejected on BGC grounds
   {
     id: "bgc5", evoId: "13", evoCode: "EVO-1013", evoName: "Mbemba Nzuzi",
@@ -490,10 +544,27 @@ export const BGC_TASKS: BgcTask[] = [
     phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
     createdAt: "2025-08-14", completedAt: "2025-08-21"
   },
-  { id: "bgc5",  evoId: "13", evoCode: "EVO-1013", evoName: "Mbemba Nzuzi",       emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "REJECTED",   finalRecommendation: "REJECTED",      assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: { livesAtAddress: false, workVerified: false, housingStatus: "TENANT" }, phase2Details: { nameVerified: true, recommendsEvo: false, addressMatch: true }, phase3Details: { reputation: "BAD", neighborsConsulted: 3 }, createdAt: "2025-08-14", completedAt: "2025-08-20" },
-  { id: "bgc19", evoId: "4",  evoCode: "EVO-1004", evoName: "Ilunga Nsenga",      emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "REJECTED",   finalRecommendation: "REJECTED",      assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: { livesAtAddress: true, workVerified: false, housingStatus: "TENANT" }, phase2Details: { nameVerified: true, recommendsEvo: false, addressMatch: true }, phase3Details: { reputation: "BAD", neighborsConsulted: 2 }, createdAt: "2025-12-20", completedAt: "2025-12-28" },
+  {
+    id: "bgc19", evoId: "4", evoCode: "EVO-1004", evoName: "Ilunga Nsenga",
+    emcName: "Nord-Kivu", emcCode: "EMC-GOM-001", province: "Nord-Kivu",
+    status: "REJECTED", finalRecommendation: "REJECTED",
+    assignedTo: "Ambroise Kabong", assignedAt: "2025-12-20T08:00:00Z", submittedAt: "2025-12-27T15:30:00Z", evaluatedBy: "Manager Kabila", evaluatedAt: "2025-12-28T10:15:00Z", evaluationResult: "REJECTED", evaluationNotes: "Phase 1 verification failed - operator does not live at registered address.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: { ...P1_PARTIAL, operatorLivesHere: false, phase1Result: "NOT_OK" }, phase2Data: { ...P2_OK, recommendsEvo: false, phase2Result: "NOT_OK" }, phase3Data: { knowsOperator: true, reputation: "BAD", neighborsConsulted: 2, phase3Result: "NOT_OK" },
+    phase1Location: GOM_LOCATION, phase2Location: GOM_LOCATION, phase3Location: GOM_LOCATION,
+    createdAt: "2025-12-20", completedAt: "2025-12-28"
+  },
   // RETURNED — sent back to AAROVE for re-verification of a specific phase
-  { id: "bgc6",  evoId: "10", evoCode: "EVO-1010", evoName: "Mulamba Musasa",     emcName: "Kinshasa Sud",  emcCode: "EMC-KIN-S01", province: "Kinshasa",     status: "RETURNED",   finalRecommendation: null,            assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: false, phase3Complete: false, phase1Details: P1_OK,   phase2Details: null, phase3Details: null,                                      createdAt: "2025-09-01", completedAt: null },
+  {
+    id: "bgc6", evoId: "10", evoCode: "EVO-1010", evoName: "Mulamba Musasa",
+    emcName: "Kinshasa Sud", emcCode: "EMC-KIN-S01", province: "Kinshasa",
+    status: "RETURNED", finalRecommendation: null,
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2025-09-01T08:00:00Z", submittedAt: "2025-09-15T14:00:00Z", evaluatedBy: "Manager Kasongo", evaluatedAt: "2025-09-16T10:00:00Z", evaluationResult: "RETURNED", evaluationNotes: "Phase 2 sponsor verification needs re-verification due to incomplete documentation.",
+    phase1Complete: true, phase2Complete: false, phase3Complete: false,
+    phase1Data: P1_OK, phase2Data: null, phase3Data: null,
+    phase1Location: KIN_LOCATION, phase2Location: null, phase3Location: null,
+    createdAt: "2025-09-01", completedAt: null
+  },
 ];
 
 // ─── EMC List ─────────────────────────────────────────────────────────────────

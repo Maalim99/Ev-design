@@ -339,6 +339,10 @@ export default function EvoAccountsPage() {
   // Active filter data — updated by onChangeFilter callback
   const [filterData, setFilterData] = React.useState<Record<string, { method: string; value: string }>>({});
 
+  // ── Pagination ──────────────────────────────────────────────────────────────
+  const [page, setPage] = React.useState(1);
+  const LIMIT = 10;
+
   const onChangeFilter = React.useCallback((values: Record<string, unknown>) => {
     setFilterData(prev => ({ ...prev, ...values as Record<string, { method: string; value: string }> }));
     setPage(1);
@@ -349,10 +353,6 @@ export default function EvoAccountsPage() {
     setFilterData({});
     setPage(1);
   }, [formMethods]);
-
-  // ── Pagination ──────────────────────────────────────────────────────────────
-  const [page, setPage] = React.useState(1);
-  const LIMIT = 10;
 
   // ── KPI counts ──────────────────────────────────────────────────────────────
   const todayStr      = new Date().toISOString().slice(0, 10);
