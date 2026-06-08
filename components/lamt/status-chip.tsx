@@ -39,7 +39,7 @@ const statusChipVariants = cva(
         normal: "bg-[#374A61]",
         danger: "bg-[#FF4507]",
         warning: "bg-[#FFEA30] text-[#11171E]",
-        success: "bg-[#36D977]",
+        success: "bg-[#1D9E75]",
         accent: "bg-[#07C1FF]",
         accentM: "bg-[#BAEEFF] text-[#11171E]",
         dangerM: "bg-[#F49E8B]",

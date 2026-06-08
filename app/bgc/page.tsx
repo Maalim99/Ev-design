@@ -80,7 +80,7 @@ interface PhaseField { label: string; value: string; check?: boolean }
 
 function PhaseCard({ title, result, fields }: { title: string; result: PhaseResult; fields: PhaseField[] }) {
   const badge =
-    result === "pass"    ? { label: "COMPLETE", bg: "#D1FAE5", text: "#059669", border: "#10B981" } :
+    result === "pass"    ? { label: "COMPLETE", bg: "#E1F5EE", text: "#1D9E75", border: "#1D9E75" } :
     result === "fail"    ? { label: "FAILED",   bg: "#FEE2E2", text: "#DC2626", border: "#EF4444" } :
                            { label: "PENDING",  bg: "#F1F5F9", text: "#64748B", border: "#CBD5E1" };
   return (
@@ -126,7 +126,7 @@ function PhaseCard({ title, result, fields }: { title: string; result: PhaseResu
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  color: f.check ? "#059669" : "#DC2626",
+                  color: f.check ? "#1D9E75" : "#DC2626",
                   fontWeight: 600
                 }}>
                   <span style={{
@@ -332,7 +332,7 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
               padding: "2px 8px",
               borderRadius: 6,
               backgroundColor: task.evaluationResult === "APPROVED" ? "#D1FAE5" : task.evaluationResult === "REJECTED" ? "#FEE2E2" : "#FEF3C7",
-              color: task.evaluationResult === "APPROVED" ? "#059669" : task.evaluationResult === "REJECTED" ? "#DC2626" : "#D97706"
+              color: task.evaluationResult === "APPROVED" ? "#1D9E75" : task.evaluationResult === "REJECTED" ? "#DC2626" : "#D97706"
             }}>
               {task.evaluationResult}
             </div>

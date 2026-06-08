@@ -25,9 +25,9 @@ export const colors = {
     light: '#FBE0DA',
   },
   success: {
-    DEFAULT: '#36D977',
-    medium: '#8BE9B1',
-    light: '#D4F7E2',
+    DEFAULT: '#1D9E75',
+    medium: '#9FE1CB',
+    light: '#E1F5EE',
   },
   warning: {
     DEFAULT: '#FFEA30',

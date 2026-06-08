@@ -32,7 +32,7 @@ export const CustomColor: Story = {
     <div className="flex gap-4">
       <Spinner baseColor="#F5A623" />
       <Spinner baseColor="#07C1FF" />
-      <Spinner baseColor="#36D977" />
+      <Spinner baseColor="#1D9E75" />
       <Spinner baseColor="#FF4507" />
     </div>
   ),

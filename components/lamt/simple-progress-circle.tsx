@@ -38,7 +38,7 @@ export const SimpleProgressCircle = React.forwardRef<
   ) => {
     const pathColorMap = {
       [SimpleProgressCircleType.Normal]: "#92A5BA",
-      [SimpleProgressCircleType.Success]: "#36D977",
+      [SimpleProgressCircleType.Success]: "#1D9E75",
       [SimpleProgressCircleType.Danger]: "#FF4507",
     };
 

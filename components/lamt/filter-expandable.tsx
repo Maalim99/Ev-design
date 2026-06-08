@@ -62,7 +62,7 @@ export const FilterExpandable = React.forwardRef<
             "before:border-2 before:border-[#92A5BA] before:rounded-full",
             "before:transition-all before:duration-300 before:ease-in-out",
             isActive &&
-              "before:border-none before:bg-[#36D977] before:w-[15px] before:h-[15px]"
+              "before:border-none before:bg-[#1D9E75] before:w-[15px] before:h-[15px]"
           )}
         >
           {headerName}
