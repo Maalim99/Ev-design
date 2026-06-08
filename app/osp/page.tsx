@@ -5,8 +5,8 @@ import { Award, Clock, AlertCircle, Eye, UserPlus, ClipboardList, ShieldCheck } 
 import { useForm } from "react-hook-form";
 import { AppShell }              from "@/components/evcore/layout/AppShell";
 import { KpiCard }               from "@/components/evcore/ui/KpiCard";
-import { EvoFormFiltersDrawer }  from "@/components/evcore/filters/EvoFormFiltersDrawer";
-import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
+import { EvoFormFiltersDrawer }  from "@/components/lamt/evo-form-filters-drawer";
+import { EvoPreferencesDrawer, type ColumnPref } from "@/components/lamt/evo-preferences-drawer";
 import { PageHeader }            from "@/components/lamt/page-header";
 import { FiltersBar }            from "@/components/lamt/filters-bar";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";

@@ -1,6 +1,6 @@
 import { FilterType, Method } from "@/lib/filter-utils";
 import type { DropdownOption } from "@/components/lamt/dropdown";
-import type { EvoFormFilterSection } from "@/components/evcore/filters/EvoFormFiltersDrawer";
+import type { EvoFormFilterSection } from "@/components/lamt/evo-form-filters-drawer";
 
 const OSP_STATUS_OPTIONS: DropdownOption[] = [
   { id: "NOT_YET_ASSIGNED", name: "Pending Assignment" },

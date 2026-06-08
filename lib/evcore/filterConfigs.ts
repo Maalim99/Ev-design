@@ -1,5 +1,5 @@
-import type { FilterSection } from "@/components/evcore/filters/EvoFiltersDrawer";
-import type { ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
+import type { FilterSection } from "@/components/lamt/evo-filters-drawer";
+import type { ColumnPref } from "@/components/lamt/evo-preferences-drawer";
 import { EMC_ZONES } from "@/data/dummy";
 
 // ─── Shared filter option sets ────────────────────────────────────────────────

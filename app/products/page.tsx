@@ -6,8 +6,8 @@ import { Package, Bike, ShoppingCart, Layers, Eye, Pencil, Trash2 } from "lucide
 import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoFormFiltersDrawer } from "@/components/evcore/filters/EvoFormFiltersDrawer";
-import { EvoPreferencesDrawer, type ColumnPref } from "@/components/evcore/filters/EvoPreferencesDrawer";
+import { EvoFormFiltersDrawer } from "@/components/lamt/evo-form-filters-drawer";
+import { EvoPreferencesDrawer, type ColumnPref } from "@/components/lamt/evo-preferences-drawer";
 import { PageHeader } from "@/components/lamt/page-header";
 import { FiltersBar } from "@/components/lamt/filters-bar";
 import { FilterMethod } from "@/components/lamt/filter-method";
