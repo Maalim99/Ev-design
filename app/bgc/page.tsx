@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Clock, CheckCircle2, AlertCircle, FileCheck, Eye, UserPlus, ClipboardCheck, ShieldCheck } from "lucide-react";
+import { Clock, CheckCircle2, AlertCircle, FileCheck, Eye, UserPlus, ClipboardCheck, ShieldCheck, XCircle } from "lucide-react";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
 import { useForm } from "react-hook-form";
@@ -22,6 +22,7 @@ import { EVO_BGC_FILTER_SECTIONS, getBgcFilterDefaults } from "@/lib/evcore/evoB
 import { Method } from "@/lib/filter-utils";
 import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { RowActionBtn } from "@/components/evcore/ui/RowActionBtn";
+import { BgcDetailModal } from "./BgcDetailModal";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -79,34 +80,88 @@ interface PhaseField { label: string; value: string; check?: boolean }
 
 function PhaseCard({ title, result, fields }: { title: string; result: PhaseResult; fields: PhaseField[] }) {
   const badge =
-    result === "pass"    ? { label: "OK",      bg: "#E1F5EE", text: "#0F6E56" } :
-    result === "fail"    ? { label: "FAIL",    bg: "#FEE2E2", text: "#991B1B" } :
-                           { label: "Pending", bg: "#F3F3F1", text: "#6B7280" };
+    result === "pass"    ? { label: "COMPLETE", bg: "#D1FAE5", text: "#059669", border: "#10B981" } :
+    result === "fail"    ? { label: "FAILED",   bg: "#FEE2E2", text: "#DC2626", border: "#EF4444" } :
+                           { label: "PENDING",  bg: "#F1F5F9", text: "#64748B", border: "#CBD5E1" };
   return (
-    <div style={{ backgroundColor: EVCORE_COLORS.pageBg, borderRadius: 10, padding: "14px 16px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.textPrimary }}>{title}</div>
-        <span style={{ fontSize: 10, fontWeight: 700, color: badge.text, backgroundColor: badge.bg, borderRadius: 4, padding: "2px 7px" }}>
+    <div style={{
+      background: "linear-gradient(145deg, #ffffff 0%, #fafafa 100%)",
+      border: `1px solid ${badge.border}40`,
+      borderRadius: 12,
+      padding: "18px 20px",
+      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+      position: "relative"
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: EVCORE_COLORS.textPrimary, lineHeight: 1.3 }}>{title}</div>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: badge.text,
+          backgroundColor: badge.bg,
+          border: `1px solid ${badge.border}30`,
+          borderRadius: 6,
+          padding: "4px 8px",
+          letterSpacing: "0.05em"
+        }}>
           {badge.label}
         </span>
       </div>
       {fields.length > 0 ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {fields.map(f => (
-            <div key={f.label} style={{ fontSize: 12, color: EVCORE_COLORS.textPrimary }}>
-              <span style={{ color: EVCORE_COLORS.textSecondary }}>{f.label}: </span>
+            <div key={f.label} style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: 13,
+              padding: "8px 12px",
+              backgroundColor: "rgba(255, 255, 255, 0.6)",
+              borderRadius: 6,
+              border: "1px solid #f1f5f9"
+            }}>
+              <span style={{ color: EVCORE_COLORS.textSecondary, fontWeight: 500 }}>{f.label}</span>
               {f.check !== undefined ? (
-                <span style={{ color: f.check ? "#0F6E56" : "#991B1B", fontWeight: 500 }}>
-                  {f.check ? "✓ " : "✗ "}{f.value}
+                <span style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  color: f.check ? "#059669" : "#DC2626",
+                  fontWeight: 600
+                }}>
+                  <span style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: 3,
+                    backgroundColor: f.check ? "#D1FAE5" : "#FEE2E2",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 10
+                  }}>
+                    {f.check ? "✓" : "✗"}
+                  </span>
+                  {f.value}
                 </span>
               ) : (
-                <span style={{ fontWeight: 600 }}>{f.value}</span>
+                <span style={{ fontWeight: 600, color: EVCORE_COLORS.textPrimary }}>{f.value}</span>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, fontStyle: "italic" }}>Not started yet</div>
+        <div style={{
+          textAlign: "center",
+          padding: "24px 16px",
+          color: EVCORE_COLORS.textSecondary,
+          fontSize: 13,
+          fontStyle: "italic",
+          backgroundColor: "rgba(255, 255, 255, 0.6)",
+          borderRadius: 8,
+          border: "1px dashed #e5e7eb"
+        }}>
+          Phase not yet started
+        </div>
       )}
     </div>
   );
@@ -127,62 +182,121 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
   const days = getDaysOpen(task);
   const daysColor = days > 14 ? EVCORE_COLORS.danger : days > 7 ? EVCORE_COLORS.amber : EVCORE_COLORS.green;
 
-  // Phase result helpers
-  const p1Result: PhaseResult = !task.phase1Complete ? "pending" : task.phase1Details?.livesAtAddress ? "pass" : "fail";
-  const p2Result: PhaseResult = !task.phase2Complete ? "pending" : task.phase2Details?.recommendsEvo  ? "pass" : "fail";
-  const p3Result: PhaseResult = !task.phase3Complete ? "pending" : task.phase3Details?.reputation === "GOOD" ? "pass" : "fail";
+  // Phase result helpers (using new comprehensive data structure)
+  const p1Result: PhaseResult = !task.phase1Complete ? "pending" : task.phase1Data?.phase1Result === "OK" ? "pass" : "fail";
+  const p2Result: PhaseResult = !task.phase2Complete ? "pending" : task.phase2Data?.phase2Result === "OK" ? "pass" : "fail";
+  const p3Result: PhaseResult = !task.phase3Complete ? "pending" : task.phase3Data?.phase3Result === "OK" ? "pass" : "fail";
 
-  const p1Fields: PhaseField[] = task.phase1Details ? [
-    { label: "Lives at address", value: task.phase1Details.livesAtAddress ? "Yes" : "No", check: task.phase1Details.livesAtAddress },
-    { label: "Work verified",    value: task.phase1Details.workVerified    ? "Yes" : "No", check: task.phase1Details.workVerified },
-    { label: "Housing status",   value: task.phase1Details.housingStatus === "OWNER" ? "Owner" : "Tenant" },
+  const p1Fields: PhaseField[] = task.phase1Data ? [
+    { label: "Operator Present", value: task.phase1Data.operatorLivesHere ? "Confirmed" : "Not Present", check: task.phase1Data.operatorLivesHere },
+    { label: "Address Match", value: task.phase1Data.addressMatchesRegistration ? "Matches" : "Different", check: task.phase1Data.addressMatchesRegistration },
+    { label: "Work Verified", value: task.phase1Data.workMatchesRegistration ? "Verified" : "Unverified", check: task.phase1Data.workMatchesRegistration },
+    { label: "Housing Status", value: `${task.phase1Data.verifiedHousingStatus} (${task.phase1Data.housingMatchesRegistration ? "Verified" : "Unverified"})`, check: task.phase1Data.housingMatchesRegistration },
+    { label: "Respondent", value: task.phase1Data.respondentRelationship },
+    { label: "Location", value: task.phase1Location ? `${task.phase1Location.lat.toFixed(4)}, ${task.phase1Location.lng.toFixed(4)}` : "Not recorded" },
   ] : [];
 
-  const p2Fields: PhaseField[] = task.phase2Details ? [
-    { label: "Name verified",   value: task.phase2Details.nameVerified   ? "Yes" : "No", check: task.phase2Details.nameVerified },
-    { label: "Recommends EVO",  value: task.phase2Details.recommendsEvo  ? "Yes" : "No", check: task.phase2Details.recommendsEvo },
-    { label: "Address match",   value: task.phase2Details.addressMatch   ? "Yes" : "No", check: task.phase2Details.addressMatch },
+  const p2Fields: PhaseField[] = task.phase2Data ? [
+    { label: "Name Verified", value: task.phase2Data.nameMatchesRegistration ? "Matches" : "Different", check: task.phase2Data.nameMatchesRegistration },
+    { label: "Phone Verified", value: task.phase2Data.phoneMatchesRegistration ? "Matches" : "Different", check: task.phase2Data.phoneMatchesRegistration },
+    { label: "Address Match", value: task.phase2Data.addressMatchesRegistration ? "Matches" : "Different", check: task.phase2Data.addressMatchesRegistration },
+    { label: "Work Verified", value: task.phase2Data.workMatchesRegistration ? "Verified" : "Unverified", check: task.phase2Data.workMatchesRegistration },
+    { label: "Relationship Verified", value: task.phase2Data.relationshipMatchesRegistration ? "Verified" : "Unverified", check: task.phase2Data.relationshipMatchesRegistration },
+    { label: "Sponsor Endorsement", value: task.phase2Data.recommendsEvo ? "Endorses EVO" : "Does Not Endorse", check: task.phase2Data.recommendsEvo },
+    { label: "Location", value: task.phase2Location ? `${task.phase2Location.lat.toFixed(4)}, ${task.phase2Location.lng.toFixed(4)}` : "Not recorded" },
   ] : [];
 
-  const p3Fields: PhaseField[] = task.phase3Details ? [
-    { label: "Reputation",          value: task.phase3Details.reputation },
-    { label: "Neighbors consulted", value: String(task.phase3Details.neighborsConsulted) },
+  const p3Fields: PhaseField[] = task.phase3Data ? [
+    { label: "Knows Operator", value: task.phase3Data.knowsOperator ? "Yes" : "No", check: task.phase3Data.knowsOperator },
+    { label: "Community Reputation", value: task.phase3Data.reputation, check: task.phase3Data.reputation === "GOOD" },
+    { label: "Neighbors Interviewed", value: `${task.phase3Data.neighborsConsulted} consulted` },
+    { label: "Location", value: task.phase3Location ? `${task.phase3Location.lat.toFixed(4)}, ${task.phase3Location.lng.toFixed(4)}` : "Not recorded" },
   ] : [];
 
   // Rich modal title with EVO code + recommendation chips inline
   const modalTitle = (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-      BGC Task — {task.evoName}
-      <span style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: EVCORE_COLORS.green, backgroundColor: "#EBF8F3", border: `0.5px solid ${EVCORE_COLORS.greenLight}`, borderRadius: 5, padding: "2px 8px" }}>
-        {task.evoCode}
-      </span>
-      {task.finalRecommendation && (
-        <StatusChip type={REC_CHIP[task.finalRecommendation].type}>{REC_CHIP[task.finalRecommendation].label}</StatusChip>
-      )}
-    </span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 18, fontWeight: 700, color: EVCORE_COLORS.textPrimary }}>
+          Background Check — {task.evoName}
+        </span>
+        <span style={{
+          fontFamily: "monospace",
+          fontSize: 12,
+          fontWeight: 700,
+          color: EVCORE_COLORS.green,
+          backgroundColor: "#E8F5F0",
+          border: "1px solid #A7F3D0",
+          borderRadius: 8,
+          padding: "4px 10px"
+        }}>
+          {task.evoCode}
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 14, color: EVCORE_COLORS.textSecondary }}>
+          {task.province} Province
+        </span>
+        {task.finalRecommendation && (
+          <>
+            <span style={{ color: EVCORE_COLORS.textSecondary }}>•</span>
+            <StatusChip type={REC_CHIP[task.finalRecommendation].type}>{REC_CHIP[task.finalRecommendation].label}</StatusChip>
+          </>
+        )}
+      </div>
+    </div>
   );
 
   return (
     <Modal opened title={modalTitle} maxWidth={760} icon={<ShieldCheck size={20} color={EVCORE_COLORS.green} />} onClose={onClose}>
 
       {/* Two info tiles */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
-        <div style={{ backgroundColor: EVCORE_COLORS.pageBg, borderRadius: 10, padding: "16px 18px" }}>
-          <div style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary, marginBottom: 6 }}>Province</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: EVCORE_COLORS.textPrimary, marginBottom: 8 }}>{task.province}</div>
-          <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary, marginBottom: 3 }}>EMC · <span style={{ fontFamily: "monospace" }}>{task.emcCode}</span></div>
-          <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>
-            {task.assignedTo ? <>Assigned to · {task.assignedTo}</> : <span style={{ color: EVCORE_COLORS.amber, fontWeight: 600 }}>Not yet assigned</span>}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div style={{
+          background: "linear-gradient(145deg, #ffffff 0%, #fafafa 100%)",
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+          padding: "20px 22px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Province</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: EVCORE_COLORS.textPrimary, marginBottom: 10, letterSpacing: "-0.01em" }}>{task.province}</div>
+          <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary, marginBottom: 4 }}>EMC · <span style={{ fontFamily: "monospace", fontWeight: 600 }}>{task.emcCode}</span></div>
+          <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>
+            {task.assignedTo ? (
+              <>
+                Assigned to · <span style={{ fontWeight: 600 }}>{task.assignedTo}</span>
+                {task.assignedAt && (
+                  <div style={{ fontSize: 11, marginTop: 2 }}>
+                    {new Date(task.assignedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                  </div>
+                )}
+              </>
+            ) : (
+              <span style={{ color: EVCORE_COLORS.amber, fontWeight: 600 }}>Not yet assigned</span>
+            )}
           </div>
         </div>
-        <div style={{ backgroundColor: EVCORE_COLORS.pageBg, borderRadius: 10, padding: "16px 18px" }}>
-          <div style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary, marginBottom: 6 }}>Days open</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: daysColor, marginBottom: 8 }}>{days}d</div>
-          <div style={{ fontSize: 12, marginBottom: 3 }}>
-            <span style={{ color: EVCORE_COLORS.textSecondary }}>Task status · </span>
+        <div style={{
+          background: "linear-gradient(145deg, #ffffff 0%, #fafafa 100%)",
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+          padding: "20px 22px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Timeline</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: daysColor, marginBottom: 10, letterSpacing: "-0.01em" }}>{days}d</div>
+          <div style={{ fontSize: 13, marginBottom: 4 }}>
+            <span style={{ color: EVCORE_COLORS.textSecondary }}>Status · </span>
             <StatusChip type={stSt.type}>{stSt.label}</StatusChip>
           </div>
-          <div style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>Registered · {fmtDate(task.createdAt)}</div>
+          <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>Created · <span style={{ fontWeight: 500 }}>{fmtDate(task.createdAt)}</span></div>
+          {task.submittedAt && (
+            <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>Submitted · <span style={{ fontWeight: 500 }}>{fmtDate(task.submittedAt)}</span></div>
+          )}
+          {task.evaluatedBy && task.evaluatedAt && (
+            <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>Evaluated by · <span style={{ fontWeight: 500 }}>{task.evaluatedBy}</span></div>
+          )}
         </div>
       </div>
 
@@ -193,26 +307,149 @@ function BgcViewModal({ task, onClose, onAssign, onApprove, onReject, onReturn }
         <PhaseCard title="Phase 3 — Neighbors" result={p3Result} fields={p3Fields} />
       </div>
 
+      {/* Evaluation Section for completed tasks */}
+      {task.evaluationNotes && task.evaluatedBy && (
+        <div style={{
+          backgroundColor: "#F8F9FA",
+          border: "1px solid #E5E7EB",
+          borderRadius: 12,
+          padding: "20px 22px",
+          marginBottom: 20
+        }}>
+          <div style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: EVCORE_COLORS.textPrimary,
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 8
+          }}>
+            Manager Evaluation
+            <div style={{
+              fontSize: 11,
+              fontWeight: 600,
+              padding: "2px 8px",
+              borderRadius: 6,
+              backgroundColor: task.evaluationResult === "APPROVED" ? "#D1FAE5" : task.evaluationResult === "REJECTED" ? "#FEE2E2" : "#FEF3C7",
+              color: task.evaluationResult === "APPROVED" ? "#059669" : task.evaluationResult === "REJECTED" ? "#DC2626" : "#D97706"
+            }}>
+              {task.evaluationResult}
+            </div>
+          </div>
+          <div style={{
+            fontSize: 13,
+            color: EVCORE_COLORS.textSecondary,
+            marginBottom: 8,
+            lineHeight: 1.5
+          }}>
+            <strong>{task.evaluatedBy}</strong> · {task.evaluatedAt ? fmtDate(task.evaluatedAt) : ""}
+          </div>
+          <div style={{
+            fontSize: 14,
+            color: EVCORE_COLORS.textPrimary,
+            lineHeight: 1.6,
+            fontStyle: "italic"
+          }}>
+            "{task.evaluationNotes}"
+          </div>
+        </div>
+      )}
+
       {/* Footer actions — UNASSIGNED and SUBMITTED only; all others use the X button to close */}
       {task.status === "NOT_YET_ASSIGNED" && (
-        <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 16, borderTop: `0.5px solid ${EVCORE_COLORS.border}` }}>
-          <button onClick={() => { onClose(); onAssign(); }} style={{ height: 34, padding: "0 18px", borderRadius: 8, border: "none", backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer" }}>Assign AAROVE Agent</button>
+        <div style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          paddingTop: 20,
+          borderTop: `1px solid #e5e7eb`,
+          marginTop: 4
+        }}>
+          <button
+            onClick={() => { onClose(); onAssign(); }}
+            style={{
+              height: 40,
+              padding: "0 20px",
+              borderRadius: 6,
+              border: "1px solid #1d9e75",
+              backgroundColor: "#1d9e75",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "white",
+              cursor: "pointer",
+              fontFamily: "inherit"
+            }}
+          >
+            Assign AAROVE Agent
+          </button>
         </div>
       )}
       {task.status === "SUBMITTED" && (
-        <div style={{ paddingTop: 16, borderTop: `0.5px solid ${EVCORE_COLORS.border}` }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>Manager Review Decision</div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => { onClose(); onApprove(); }}
-              style={{ flex: 1, height: 40, borderRadius: 8, border: "none", backgroundColor: EVCORE_COLORS.green, fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>
+        <div style={{
+          paddingTop: 20,
+          borderTop: `1px solid #e5e7eb`,
+          marginTop: 4
+        }}>
+          <div style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: EVCORE_COLORS.textPrimary,
+            marginBottom: 16,
+            paddingBottom: 12,
+            borderBottom: "1px solid #f1f5f9"
+          }}>
+            Manager Review Decision
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => { onClose(); onApprove(); }}
+              style={{
+                flex: 1,
+                height: 40,
+                borderRadius: 6,
+                border: "1px solid #10b981",
+                backgroundColor: "#10b981",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "white",
+                cursor: "pointer",
+                fontFamily: "inherit"
+              }}
+            >
               ✓ Approve
             </button>
-            <button onClick={() => { onClose(); onReturn(); }}
-              style={{ flex: 1, height: 40, borderRadius: 8, border: `1.5px solid ${EVCORE_COLORS.amber}`, backgroundColor: "transparent", fontSize: 13, fontWeight: 700, color: "#854F0B", cursor: "pointer" }}>
+            <button
+              onClick={() => { onClose(); onReturn(); }}
+              style={{
+                flex: 1,
+                height: 40,
+                borderRadius: 6,
+                border: "1px solid #f59e0b",
+                backgroundColor: "white",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#d97706",
+                cursor: "pointer",
+                fontFamily: "inherit"
+              }}
+            >
               ↩ Return
             </button>
-            <button onClick={() => { onClose(); onReject(); }}
-              style={{ flex: 1, height: 40, borderRadius: 8, border: `1.5px solid ${EVCORE_COLORS.danger}`, backgroundColor: "transparent", fontSize: 13, fontWeight: 700, color: EVCORE_COLORS.danger, cursor: "pointer" }}>
+            <button
+              onClick={() => { onClose(); onReject(); }}
+              style={{
+                flex: 1,
+                height: 40,
+                borderRadius: 6,
+                border: "1px solid #ef4444",
+                backgroundColor: "white",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#dc2626",
+                cursor: "pointer",
+                fontFamily: "inherit"
+              }}
+            >
               ✗ Reject
             </button>
           </div>
@@ -497,7 +734,7 @@ export default function BgcPage() {
         </div>
       </AppShell>
 
-      <BgcViewModal
+      <BgcDetailModal
         task={viewTask}
         onClose={() => setViewTask(null)}
         onAssign={() => setAssignTask(viewTask)}

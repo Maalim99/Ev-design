@@ -195,20 +195,60 @@ export const FLEET_ASSETS: FleetAsset[] = [
 
 export type BgcTaskStatus = "NOT_YET_ASSIGNED" | "ASSIGNED" | "SUBMITTED" | "APPROVED" | "REJECTED" | "RETURNED";
 export type BgcRecommendation = "RECOMMENDED" | "REJECTED" | "MANUAL_REVIEW";
+export type BgcPhaseResult = "OK" | "NOT_OK";
 
-export interface BgcPhase1Details {
-  livesAtAddress: boolean;
-  workVerified: boolean;
-  housingStatus: "OWNER" | "TENANT";
+export interface BgcLocation {
+  lat: number;
+  lng: number;
+  capturedAt: string;
 }
-export interface BgcPhase2Details {
-  nameVerified: boolean;
-  recommendsEvo: boolean;
-  addressMatch: boolean;
+
+export interface BgcPhase1Data {
+  verifiedAddress: {
+    city: string;
+    commune: string;
+    quartier: string;
+    avenue: string;
+    plotNumber: string;
+  };
+  addressMatchesRegistration: boolean;
+  operatorLivesHere: boolean;          // KEY FIELD
+  respondentRelationship: string;
+  verifiedWork: string;
+  workMatchesRegistration: boolean;
+  verifiedHousingStatus: "OWNER" | "TENANT";
+  housingMatchesRegistration: boolean;
+  phase1Result: BgcPhaseResult;
 }
-export interface BgcPhase3Details {
+
+export interface BgcPhase2Data {
+  verifiedName: string;
+  nameMatchesRegistration: boolean;
+  verifiedPhone: string;
+  phoneMatchesRegistration: boolean;
+  verifiedAddress: {
+    city: string;
+    commune: string;
+    quartier: string;
+    avenue: string;
+    plotNumber: string;
+  };
+  addressMatchesRegistration: boolean;
+  verifiedWork: string;
+  workMatchesRegistration: boolean;
+  verifiedRelationship: string;
+  relationshipMatchesRegistration: boolean;
+  verifiedHousingStatus: "OWNER" | "TENANT";
+  housingMatchesRegistration: boolean;
+  recommendsEvo: boolean;              // CRITICAL FIELD
+  phase2Result: BgcPhaseResult;
+}
+
+export interface BgcPhase3Data {
+  knowsOperator: boolean;
   reputation: "GOOD" | "BAD";
   neighborsConsulted: number;
+  phase3Result: BgcPhaseResult;
 }
 
 export interface BgcTask {
@@ -222,34 +262,217 @@ export interface BgcTask {
   status: BgcTaskStatus;
   finalRecommendation: BgcRecommendation | null;
   assignedTo: string | null;
+  assignedAt: string | null;
+  submittedAt: string | null;
+  evaluatedBy: string | null;
+  evaluatedAt: string | null;
+  evaluationResult: "APPROVED" | "REJECTED" | "RETURNED" | null;
+  evaluationNotes: string | null;
+
+  // Phase completion flags
   phase1Complete: boolean;
   phase2Complete: boolean;
   phase3Complete: boolean;
-  phase1Details: BgcPhase1Details | null;
-  phase2Details: BgcPhase2Details | null;
-  phase3Details: BgcPhase3Details | null;
+
+  // Detailed phase data (matching tech spec)
+  phase1Data: BgcPhase1Data | null;
+  phase2Data: BgcPhase2Data | null;
+  phase3Data: BgcPhase3Data | null;
+
+  // Location tracking for each phase
+  phase1Location: BgcLocation | null;
+  phase2Location: BgcLocation | null;
+  phase3Location: BgcLocation | null;
+
   createdAt: string;
   completedAt: string | null;
 }
 
-const P1_OK:   BgcPhase1Details = { livesAtAddress: true,  workVerified: true,  housingStatus: "OWNER"  };
-const P1_OK_T: BgcPhase1Details = { livesAtAddress: true,  workVerified: true,  housingStatus: "TENANT" };
-const P2_OK:   BgcPhase2Details = { nameVerified: true,  recommendsEvo: true,  addressMatch: true  };
+// Sample location data
+const KIN_LOCATION: BgcLocation = { lat: -4.3317, lng: 15.3139, capturedAt: "2026-05-01T08:30:00Z" };
+const LUB_LOCATION: BgcLocation = { lat: -11.6702, lng: 27.4797, capturedAt: "2026-05-01T14:20:00Z" };
+const GOM_LOCATION: BgcLocation = { lat: -1.6826, lng: 29.2387, capturedAt: "2026-05-01T10:45:00Z" };
+
+// Comprehensive phase data templates
+const P1_OK: BgcPhase1Data = {
+  verifiedAddress: { city: "Kinshasa", commune: "Lingwala", quartier: "Kintambo", avenue: "Av. Kasa-Vubu", plotNumber: "12" },
+  addressMatchesRegistration: true,
+  operatorLivesHere: true,
+  respondentRelationship: "Self",
+  verifiedWork: "Moto-Taxi",
+  workMatchesRegistration: true,
+  verifiedHousingStatus: "OWNER",
+  housingMatchesRegistration: true,
+  phase1Result: "OK"
+};
+
+const P1_OK_T: BgcPhase1Data = {
+  verifiedAddress: { city: "Kinshasa", commune: "Kalamu", quartier: "Matonge", avenue: "Av. Kabambare", plotNumber: "34" },
+  addressMatchesRegistration: true,
+  operatorLivesHere: true,
+  respondentRelationship: "Self",
+  verifiedWork: "Small Commerce",
+  workMatchesRegistration: true,
+  verifiedHousingStatus: "TENANT",
+  housingMatchesRegistration: true,
+  phase1Result: "OK"
+};
+
+const P1_PARTIAL: BgcPhase1Data = {
+  verifiedAddress: { city: "Kinshasa", commune: "Lemba", quartier: "Lemba", avenue: "Av. Poids Lourds", plotNumber: "18" },
+  addressMatchesRegistration: true,
+  operatorLivesHere: true,
+  respondentRelationship: "Self",
+  verifiedWork: "Small Commerce",
+  workMatchesRegistration: false,  // Issue here
+  verifiedHousingStatus: "TENANT",
+  housingMatchesRegistration: true,
+  phase1Result: "NOT_OK"
+};
+
+const P2_OK: BgcPhase2Data = {
+  verifiedName: "Lukusa Bienvenu",
+  nameMatchesRegistration: true,
+  verifiedPhone: "+243 812 345 001",
+  phoneMatchesRegistration: true,
+  verifiedAddress: { city: "Kinshasa", commune: "Lingwala", quartier: "Kintambo", avenue: "Av. Kasa-Vubu", plotNumber: "12" },
+  addressMatchesRegistration: true,
+  verifiedWork: "Moto-Taxi",
+  workMatchesRegistration: true,
+  verifiedRelationship: "Father",
+  relationshipMatchesRegistration: true,
+  verifiedHousingStatus: "OWNER",
+  housingMatchesRegistration: true,
+  recommendsEvo: true,
+  phase2Result: "OK"
+};
+
+const P2_PARTIAL: BgcPhase2Data = {
+  verifiedName: "Ndaya Tshilombo",
+  nameMatchesRegistration: true,
+  verifiedPhone: "+243 812 345 006",
+  phoneMatchesRegistration: true,
+  verifiedAddress: { city: "Kinshasa", commune: "Lemba", quartier: "Lemba", avenue: "Av. Poids Lourds", plotNumber: "15" },  // Wrong plot number
+  addressMatchesRegistration: false,
+  verifiedWork: "Small Commerce",
+  workMatchesRegistration: true,
+  verifiedRelationship: "Uncle",
+  relationshipMatchesRegistration: true,
+  verifiedHousingStatus: "TENANT",
+  housingMatchesRegistration: true,
+  recommendsEvo: true,
+  phase2Result: "NOT_OK"
+};
+
+const P3_OK: BgcPhase3Data = {
+  knowsOperator: true,
+  reputation: "GOOD",
+  neighborsConsulted: 3,
+  phase3Result: "OK"
+};
+
+const P3_GOOD: BgcPhase3Data = {
+  knowsOperator: true,
+  reputation: "GOOD",
+  neighborsConsulted: 4,
+  phase3Result: "OK"
+};
 
 export const BGC_TASKS: BgcTask[] = [
   // UNASSIGNED — task created, no agent yet
-  { id: "bgc1",  evoId: "2",  evoCode: "EVO-1002", evoName: "Kabongo Mwilambwe",   emcName: "Kinshasa Sud",  emcCode: "EMC-KIN-S01", province: "Kinshasa",     status: "NOT_YET_ASSIGNED", finalRecommendation: null,            assignedTo: null,                  phase1Complete: false, phase2Complete: false, phase3Complete: false, phase1Details: null,   phase2Details: null, phase3Details: null,                                      createdAt: "2026-01-10", completedAt: null },
-  { id: "bgc2",  evoId: "11", evoCode: "EVO-1011", evoName: "Ntumba Tshisekedi",  emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", province: "Haut-Katanga", status: "NOT_YET_ASSIGNED", finalRecommendation: null,            assignedTo: null,                  phase1Complete: false, phase2Complete: false, phase3Complete: false, phase1Details: null,   phase2Details: null, phase3Details: null,                                      createdAt: "2026-02-11", completedAt: null },
+  {
+    id: "bgc1", evoId: "2", evoCode: "EVO-1002", evoName: "Kabongo Mwilambwe",
+    emcName: "Kinshasa Sud", emcCode: "EMC-KIN-S01", province: "Kinshasa",
+    status: "NOT_YET_ASSIGNED", finalRecommendation: null,
+    assignedTo: null, assignedAt: null, submittedAt: null, evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: false, phase2Complete: false, phase3Complete: false,
+    phase1Data: null, phase2Data: null, phase3Data: null,
+    phase1Location: null, phase2Location: null, phase3Location: null,
+    createdAt: "2026-01-10", completedAt: null
+  },
+  {
+    id: "bgc2", evoId: "11", evoCode: "EVO-1011", evoName: "Ntumba Tshisekedi",
+    emcName: "Katanga EMC", emcCode: "EMC-KAT-001", province: "Haut-Katanga",
+    status: "NOT_YET_ASSIGNED", finalRecommendation: null,
+    assignedTo: null, assignedAt: null, submittedAt: null, evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: false, phase2Complete: false, phase3Complete: false,
+    phase1Data: null, phase2Data: null, phase3Data: null,
+    phase1Location: null, phase2Location: null, phase3Location: null,
+    createdAt: "2026-02-11", completedAt: null
+  },
   // ASSIGNED — AAROVE is actively working the phases
-  { id: "bgc8",  evoId: "5",  evoCode: "EVO-1005", evoName: "Kasongo Mulumba",    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "ASSIGNED",   finalRecommendation: null,            assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: false, phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: null,                                      createdAt: "2026-02-01", completedAt: null },
-  { id: "bgc11", evoId: "15", evoCode: "EVO-1015", evoName: "Jean-Pierre Kabila", emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", province: "Haut-Katanga", status: "ASSIGNED",   finalRecommendation: null,            assignedTo: "Patience Wa Mwila",   phase1Complete: true,  phase2Complete: false, phase3Complete: false, phase1Details: P1_OK,   phase2Details: null, phase3Details: null,                                      createdAt: "2026-02-10", completedAt: null },
+  {
+    id: "bgc8", evoId: "5", evoCode: "EVO-1005", evoName: "Kasongo Mulumba",
+    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",
+    status: "ASSIGNED", finalRecommendation: null,
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-02-01T09:00:00Z", submittedAt: null, evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: true, phase2Complete: true, phase3Complete: false,
+    phase1Data: P1_OK_T, phase2Data: P2_OK, phase3Data: null,
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: null,
+    createdAt: "2026-02-01", completedAt: null
+  },
+  {
+    id: "bgc11", evoId: "15", evoCode: "EVO-1015", evoName: "Jean-Pierre Kabila",
+    emcName: "Katanga EMC", emcCode: "EMC-KAT-001", province: "Haut-Katanga",
+    status: "ASSIGNED", finalRecommendation: null,
+    assignedTo: "Patience Wa Mwila", assignedAt: "2026-02-10T11:30:00Z", submittedAt: null, evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: true, phase2Complete: false, phase3Complete: false,
+    phase1Data: P1_OK, phase2Data: null, phase3Data: null,
+    phase1Location: LUB_LOCATION, phase2Location: null, phase3Location: null,
+    createdAt: "2026-02-10", completedAt: null
+  },
   // SUBMITTED — all 3 phases complete, awaiting manager decision
-  { id: "bgc9",  evoId: "6",  evoCode: "EVO-1006", evoName: "Ndaya Tshilombo",    emcName: "Kinshasa Sud",  emcCode: "EMC-KIN-S01", province: "Kinshasa",     status: "SUBMITTED",  finalRecommendation: "MANUAL_REVIEW", assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: { livesAtAddress: true, workVerified: false, housingStatus: "TENANT" }, phase2Details: { nameVerified: true, recommendsEvo: true, addressMatch: false }, phase3Details: { reputation: "GOOD", neighborsConsulted: 2 }, createdAt: "2026-02-03", completedAt: null },
-  { id: "bgc12", evoId: "9",  evoCode: "EVO-1009", evoName: "Balume Kalonji",     emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "SUBMITTED",  finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2026-05-01", completedAt: null },
-  { id: "bgc13", evoId: "20", evoCode: "EVO-1020", evoName: "Rebecca Tshomba",    emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "SUBMITTED",  finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 4 }, createdAt: "2026-05-05", completedAt: null },
+  {
+    id: "bgc9", evoId: "6", evoCode: "EVO-1006", evoName: "Ndaya Tshilombo",
+    emcName: "Kinshasa Sud", emcCode: "EMC-KIN-S01", province: "Kinshasa",
+    status: "SUBMITTED", finalRecommendation: "MANUAL_REVIEW",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-02-03T08:00:00Z", submittedAt: "2026-05-08T16:45:00Z", evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_PARTIAL, phase2Data: P2_PARTIAL, phase3Data: P3_OK,
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2026-02-03", completedAt: null
+  },
+  {
+    id: "bgc12", evoId: "9", evoCode: "EVO-1009", evoName: "Balume Kalonji",
+    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",
+    status: "SUBMITTED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-05-01T07:30:00Z", submittedAt: "2026-05-08T14:20:00Z", evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: P3_OK,
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2026-05-01", completedAt: null
+  },
+  {
+    id: "bgc13", evoId: "20", evoCode: "EVO-1020", evoName: "Rebecca Tshomba",
+    emcName: "Nord-Kivu", emcCode: "EMC-GOM-001", province: "Nord-Kivu",
+    status: "SUBMITTED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Ambroise Kabong", assignedAt: "2026-05-05T10:15:00Z", submittedAt: "2026-05-09T13:30:00Z", evaluatedBy: null, evaluatedAt: null, evaluationResult: null, evaluationNotes: null,
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK_T, phase2Data: P2_OK, phase3Data: P3_GOOD,
+    phase1Location: GOM_LOCATION, phase2Location: GOM_LOCATION, phase3Location: GOM_LOCATION,
+    createdAt: "2026-05-05", completedAt: null
+  },
   // APPROVED — manager signed off
-  { id: "bgc3",  evoId: "3",  evoCode: "EVO-1003", evoName: "Mwamba Katanga",     emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", province: "Haut-Katanga", status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Patience Wa Mwila",   phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2026-01-12", completedAt: "2026-05-08" },
-  { id: "bgc4",  evoId: "14", evoCode: "EVO-1014", evoName: "Mutu Kikwit",        emcName: "Kinshasa Sud",  emcCode: "EMC-KIN-S01", province: "Kinshasa",     status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 2 }, createdAt: "2026-02-14", completedAt: "2026-05-02" },
+  {
+    id: "bgc3", evoId: "3", evoCode: "EVO-1003", evoName: "Mwamba Katanga",
+    emcName: "Katanga EMC", emcCode: "EMC-KAT-001", province: "Haut-Katanga",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Patience Wa Mwila", assignedAt: "2026-01-12T08:00:00Z", submittedAt: "2026-05-07T17:15:00Z", evaluatedBy: "Manager Mukendi", evaluatedAt: "2026-05-08T09:30:00Z", evaluationResult: "APPROVED", evaluationNotes: "All phases completed successfully. Strong community support and clean verification.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: P2_OK, phase3Data: P3_OK,
+    phase1Location: LUB_LOCATION, phase2Location: LUB_LOCATION, phase3Location: LUB_LOCATION,
+    createdAt: "2026-01-12", completedAt: "2026-05-08"
+  },
+  {
+    id: "bgc4", evoId: "14", evoCode: "EVO-1014", evoName: "Mutu Kikwit",
+    emcName: "Kinshasa Sud", emcCode: "EMC-KIN-S01", province: "Kinshasa",
+    status: "APPROVED", finalRecommendation: "RECOMMENDED",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2026-02-14T09:15:00Z", submittedAt: "2026-05-01T11:45:00Z", evaluatedBy: "Manager Kasongo", evaluatedAt: "2026-05-02T10:30:00Z", evaluationResult: "APPROVED", evaluationNotes: "Excellent verification across all phases. Community endorsement is strong.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK_T, phase2Data: P2_OK, phase3Data: { knowsOperator: true, reputation: "GOOD", neighborsConsulted: 2, phase3Result: "OK" },
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2026-02-14", completedAt: "2026-05-02"
+  },
   { id: "bgc10", evoId: "17", evoCode: "EVO-1017", evoName: "Esther Kalonga",     emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2026-02-12", completedAt: "2026-05-10" },
   { id: "bgc14", evoId: "1",  evoCode: "EVO-1001", evoName: "Lukusa Bienvenu",    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 4 }, createdAt: "2026-01-04", completedAt: "2026-01-10" },
   { id: "bgc15", evoId: "7",  evoCode: "EVO-1007", evoName: "Kalombo Kayumba",    emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", province: "Haut-Katanga", status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Patience Wa Mwila",   phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2025-11-15", completedAt: "2025-11-22" },
@@ -257,6 +480,16 @@ export const BGC_TASKS: BgcTask[] = [
   { id: "bgc17", evoId: "12", evoCode: "EVO-1012", evoName: "Kanda Luvuya",       emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK_T, phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 3 }, createdAt: "2025-12-01", completedAt: "2025-12-08" },
   { id: "bgc18", evoId: "16", evoCode: "EVO-1016", evoName: "Grace Mbuyi",        emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "APPROVED",   finalRecommendation: "RECOMMENDED",   assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: P1_OK,   phase2Details: P2_OK, phase3Details: { reputation: "GOOD", neighborsConsulted: 4 }, createdAt: "2025-11-25", completedAt: "2025-12-02" },
   // REJECTED — auto-rejected on BGC grounds
+  {
+    id: "bgc5", evoId: "13", evoCode: "EVO-1013", evoName: "Mbemba Nzuzi",
+    emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",
+    status: "REJECTED", finalRecommendation: "REJECTED",
+    assignedTo: "Jean-Pierre Ndinga", assignedAt: "2025-08-14T08:00:00Z", submittedAt: "2025-08-20T16:30:00Z", evaluatedBy: "Manager Nkulu", evaluatedAt: "2025-08-21T09:15:00Z", evaluationResult: "REJECTED", evaluationNotes: "Phase 2 sponsor verification failed - sponsor does not recommend EVO due to behavioral concerns.",
+    phase1Complete: true, phase2Complete: true, phase3Complete: true,
+    phase1Data: P1_OK, phase2Data: { ...P2_OK, recommendsEvo: false, phase2Result: "NOT_OK" }, phase3Data: { knowsOperator: true, reputation: "BAD", neighborsConsulted: 3, phase3Result: "NOT_OK" },
+    phase1Location: KIN_LOCATION, phase2Location: KIN_LOCATION, phase3Location: KIN_LOCATION,
+    createdAt: "2025-08-14", completedAt: "2025-08-21"
+  },
   { id: "bgc5",  evoId: "13", evoCode: "EVO-1013", evoName: "Mbemba Nzuzi",       emcName: "Kinshasa Nord", emcCode: "EMC-KIN-N01", province: "Kinshasa",     status: "REJECTED",   finalRecommendation: "REJECTED",      assignedTo: "Jean-Pierre Ndinga",  phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: { livesAtAddress: false, workVerified: false, housingStatus: "TENANT" }, phase2Details: { nameVerified: true, recommendsEvo: false, addressMatch: true }, phase3Details: { reputation: "BAD", neighborsConsulted: 3 }, createdAt: "2025-08-14", completedAt: "2025-08-20" },
   { id: "bgc19", evoId: "4",  evoCode: "EVO-1004", evoName: "Ilunga Nsenga",      emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", province: "Nord-Kivu",    status: "REJECTED",   finalRecommendation: "REJECTED",      assignedTo: "Ambroise Kabong",     phase1Complete: true,  phase2Complete: true,  phase3Complete: true,  phase1Details: { livesAtAddress: true, workVerified: false, housingStatus: "TENANT" }, phase2Details: { nameVerified: true, recommendsEvo: false, addressMatch: true }, phase3Details: { reputation: "BAD", neighborsConsulted: 2 }, createdAt: "2025-12-20", completedAt: "2025-12-28" },
   // RETURNED — sent back to AAROVE for re-verification of a specific phase
