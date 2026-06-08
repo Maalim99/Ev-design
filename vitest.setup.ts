@@ -22,18 +22,22 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock IntersectionObserver
-globalThis.IntersectionObserver = vi.fn(() => ({
+globalThis.IntersectionObserver = vi.fn().mockImplementation((callback: IntersectionObserverCallback) => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   unobserve: vi.fn(),
-}));
+  root: null,
+  rootMargin: '',
+  thresholds: [],
+  takeRecords: vi.fn(() => []),
+})) as any;
 
 // Mock ResizeObserver
-globalThis.ResizeObserver = vi.fn(() => ({
+globalThis.ResizeObserver = vi.fn().mockImplementation((callback: ResizeObserverCallback) => ({
   disconnect: vi.fn(),
   observe: vi.fn(),
   unobserve: vi.fn(),
-}));
+})) as any;
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
