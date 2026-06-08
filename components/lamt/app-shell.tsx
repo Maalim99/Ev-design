@@ -309,7 +309,8 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
 
-  const isActive = React.useCallback((href: string) => {
+  const isActive = React.useCallback((href: string | null | undefined) => {
+    if (!href || !pathname) return false;
     return href === "/" ? pathname === "/" : pathname.startsWith(href);
   }, [pathname]);
 
@@ -346,7 +347,7 @@ export function AppShell({
 
         {/* Navigation */}
         <nav className="flex items-stretch flex-1 px-2 overflow-x-auto">
-          {navigation.map((item) => {
+          {navigation.filter(item => item && item.href && item.label).map((item) => {
             const active = isActive(item.href);
             return (
               <a
