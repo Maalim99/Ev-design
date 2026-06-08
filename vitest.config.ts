@@ -15,11 +15,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(dirname, '.'),
-      '@/components/lamt': path.resolve(dirname, './components/lamt'),
-      '@/components/evcore': path.resolve(dirname, './components/evcore'),
-      '@/components/ui': path.resolve(dirname, './components/ui'),
+      '@/components': path.resolve(dirname, './components'),
       '@/lib': path.resolve(dirname, './lib'),
       '@/data': path.resolve(dirname, './data'),
+      '@/app': path.resolve(dirname, './app'),
     },
   },
   test: {
@@ -45,6 +44,15 @@ export default defineConfig({
       },
       // Add a separate project for unit tests
       {
+        resolve: {
+          alias: {
+            '@': path.resolve(dirname, '.'),
+            '@/components': path.resolve(dirname, './components'),
+            '@/lib': path.resolve(dirname, './lib'),
+            '@/data': path.resolve(dirname, './data'),
+            '@/app': path.resolve(dirname, './app'),
+          },
+        },
         test: {
           name: 'unit',
           include: ['**/*.test.{ts,tsx}'],

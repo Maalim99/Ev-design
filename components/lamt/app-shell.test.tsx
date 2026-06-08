@@ -74,7 +74,7 @@ describe('AppShell', () => {
   it('renders notification count when provided', () => {
     render(<AppShell {...defaultProps} notificationCount={5} />);
 
-    // The notification count should be rendered somewhere in the component
-    expect(screen.getByText('5')).toBeDefined();
+    // The notification count should be accessible via aria-label
+    expect(screen.getByLabelText('Notifications (5)')).toBeDefined();
   });
 });

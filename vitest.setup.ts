@@ -33,11 +33,14 @@ globalThis.IntersectionObserver = vi.fn().mockImplementation((callback: Intersec
 })) as any;
 
 // Mock ResizeObserver
-globalThis.ResizeObserver = vi.fn().mockImplementation((callback: ResizeObserverCallback) => ({
-  disconnect: vi.fn(),
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-})) as any;
+globalThis.ResizeObserver = class ResizeObserver {
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+  constructor(callback: ResizeObserverCallback) {
+    // Store callback if needed for future testing
+  }
+};
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
