@@ -9,6 +9,7 @@ import { Users, ClipboardCheck, CheckCircle2, CalendarPlus } from "lucide-react"
 
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
+import { EvoStatusChip } from "@/components/lamt/evo-status-chip";
 import { EvoDetailModal, DeleteConfirmModal } from "@/components/evcore/ui/EvoDetailModal";
 import { RegisterEvoModal } from "@/components/evcore/modals/RegisterEvoModal";
 import { EditEvoModal } from "@/components/evcore/modals/EditEvoModal";
@@ -36,18 +37,6 @@ import {
 } from "@/lib/evcore/evoAccountFilterSections";
 import { ACCOUNTS_DEFAULT_COLUMNS } from "@/lib/evcore/filterConfigs";
 
-// ─── EVO status → lamt StatusChip mapping ────────────────────────────────────
-
-const EVO_STATUS_CHIP: Record<string, { type: StatusChipType; label: string }> = {
-  ACTIVE:            { type: StatusChipType.Success, label: "Active"            },
-  PENDING_BGC:      { type: StatusChipType.Warning, label: "Pending BGC"      },
-  PENDING_OSP: { type: StatusChipType.Accent,  label: "Pending OSP" },
-  PENDING_RP:  { type: StatusChipType.Info,    label: "Pending RP"  },
-  PARTIAL_RP:   { type: StatusChipType.AccentM, label: "Partial RP"   },
-  PENDING_HO: { type: StatusChipType.AccentM, label: "Pending HO" },
-  INACTIVE:          { type: StatusChipType.Normal,  label: "Inactive"          },
-  DISENGAGED:        { type: StatusChipType.Danger,  label: "Disengaged"        },
-};
 
 // ─── Static lookup maps ───────────────────────────────────────────────────────
 
@@ -137,9 +126,7 @@ function ChangeStatusModal({ evo, onClose }: { evo: EvoAccount | null; onClose: 
           <div style={{ fontSize: 15, fontWeight: 700, color: EVCORE_COLORS.textPrimary }}>{evo.fullName}</div>
           <div style={{ fontSize: 12, fontFamily: "monospace", color: EVCORE_COLORS.textSecondary, marginTop: 3 }}>{evo.evoCode}</div>
         </div>
-        <StatusChip type={EVO_STATUS_CHIP[evo.status].type}>
-          {EVO_STATUS_CHIP[evo.status].label}
-        </StatusChip>
+        <EvoStatusChip status={evo.status} />
       </div>
       <div style={{ marginBottom: 18 }}>
         <label style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>New status</label>
@@ -151,9 +138,7 @@ function ChangeStatusModal({ evo, onClose }: { evo: EvoAccount | null; onClose: 
         {nextStatus && (
           <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>Will become:</span>
-            <StatusChip type={EVO_STATUS_CHIP[nextStatus].type}>
-              {EVO_STATUS_CHIP[nextStatus].label}
-            </StatusChip>
+            <EvoStatusChip status={nextStatus as EvoStatus} />
           </div>
         )}
       </div>
@@ -195,9 +180,7 @@ function AssignAssetModal({ evo, onClose }: { evo: EvoAccount | null; onClose: (
             {evo.emcName}
           </div>
         </div>
-        <StatusChip type={EVO_STATUS_CHIP[evo.status].type}>
-          {EVO_STATUS_CHIP[evo.status].label}
-        </StatusChip>
+        <EvoStatusChip status={evo.status} />
       </div>
       <div style={{ borderRadius: 8, padding: "12px 14px", marginBottom: 18, backgroundColor: eligible ? "#EBF8F3" : "#FEF9EE", border: `0.5px solid ${eligible ? EVCORE_COLORS.greenLight : EVCORE_COLORS.amber}`, fontSize: 13, color: eligible ? "#0F6E56" : "#854F0B", display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>{eligible ? "✓" : "⚠"}</span>
@@ -459,7 +442,7 @@ export default function EvoAccountsPage() {
     phone:        e => <span style={{ fontSize: 12, fontFamily: "monospace" }}>{e.phoneNumbers[0]}</span>,
     emc:          e => <span style={{ fontSize: 12 }}>{e.emcName}</span>,
     product:      e => <span style={{ fontFamily: "monospace", fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.evProductCode}</span>,
-    status:       e => { const s = EVO_STATUS_CHIP[e.status]; return s ? <StatusChip type={s.type}>{s.label}</StatusChip> : null; },
+    status:       e => <EvoStatusChip status={e.status} />,
     balance:      e => <span style={{ fontSize: 12, fontWeight: 500, color: e.balance > 0 ? EVCORE_COLORS.textPrimary : EVCORE_COLORS.textSecondary }}>{e.balance > 0 ? `$${e.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}` : "—"}</span>,
     bgc:          e => <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.bgcDecision ?? "—"}</span>,
     osp:          e => <span style={{ fontSize: 11, color: EVCORE_COLORS.textSecondary }}>{e.ospStatus ?? "—"}</span>,
