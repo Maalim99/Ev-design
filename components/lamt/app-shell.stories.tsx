@@ -183,23 +183,22 @@ export const CustomUser: Story = {
   },
 };
 
-// With avatar image
-export const WithAvatar: Story = {
+// With different user role
+export const DifferentUserRole: Story = {
   args: {
     user: {
       name: "Alex Chen",
       role: "Senior Developer",
       initials: "AC",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
     },
     children: (
       <div className="space-y-6">
         <PageHeader
-          title="User with Avatar"
-          subtitle="Shows how user avatars are displayed"
+          title="User with Different Role"
+          subtitle="Shows how user information is displayed"
         />
         <div className="bg-white rounded-lg p-6 border">
-          <p>User menu displays the avatar image instead of initials.</p>
+          <p>User menu displays user information with initials in the avatar.</p>
         </div>
       </div>
     ),
