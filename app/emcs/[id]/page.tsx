@@ -15,7 +15,6 @@ import {
 import { TextInput } from "@/components/lamt/text-input";
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoStatusChip } from "@/components/evcore/ui/EvoStatusChip";
 import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { Tabs, type TabItem } from "@/components/lamt/tabs";
 import { Modal } from "@/components/lamt/modal";
@@ -31,6 +30,19 @@ import {
   type EmcBattery,
 } from "@/data/dummy";
 import { EVCORE_COLORS, EVO_STATUS_LABELS } from "@/lib/evcore/constants";
+
+// ─── EVO status → LAMT StatusChip mapping ────────────────────────────────────
+
+const EVO_STATUS_CHIP: Record<string, { type: StatusChipType; label: string }> = {
+  ACTIVE:            { type: StatusChipType.Success, label: "Active"            },
+  PENDING_BGC:      { type: StatusChipType.Warning, label: "Pending BGC"      },
+  PENDING_OSP: { type: StatusChipType.Accent,  label: "Pending OSP" },
+  PENDING_RP:  { type: StatusChipType.Info,    label: "Pending RP"  },
+  PARTIAL_RP:   { type: StatusChipType.AccentM, label: "Partial RP"   },
+  PENDING_HO: { type: StatusChipType.AccentM, label: "Pending HO" },
+  INACTIVE:          { type: StatusChipType.Normal,  label: "Inactive"          },
+  DISENGAGED:        { type: StatusChipType.Danger,  label: "Disengaged"        },
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -541,7 +553,7 @@ export default function EmcDetailPage() {
         {e.evProductCode}
       </span>
     ),
-    status: <EvoStatusChip status={e.status} size="sm" />,
+    status: <StatusChip type={EVO_STATUS_CHIP[e.status].type}>{EVO_STATUS_CHIP[e.status].label}</StatusChip>,
     balance: (
       <span
         style={{

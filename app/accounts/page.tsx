@@ -9,7 +9,6 @@ import { Users, ClipboardCheck, CheckCircle2, CalendarPlus } from "lucide-react"
 
 import { AppShell } from "@/components/evcore/layout/AppShell";
 import { KpiCard } from "@/components/evcore/ui/KpiCard";
-import { EvoStatusChip } from "@/components/evcore/ui/EvoStatusChip";
 import { EvoDetailModal, DeleteConfirmModal } from "@/components/evcore/ui/EvoDetailModal";
 import { RegisterEvoModal } from "@/components/evcore/modals/RegisterEvoModal";
 import { EditEvoModal } from "@/components/evcore/modals/EditEvoModal";
@@ -138,7 +137,9 @@ function ChangeStatusModal({ evo, onClose }: { evo: EvoAccount | null; onClose: 
           <div style={{ fontSize: 15, fontWeight: 700, color: EVCORE_COLORS.textPrimary }}>{evo.fullName}</div>
           <div style={{ fontSize: 12, fontFamily: "monospace", color: EVCORE_COLORS.textSecondary, marginTop: 3 }}>{evo.evoCode}</div>
         </div>
-        <EvoStatusChip status={evo.status} />
+        <StatusChip type={EVO_STATUS_CHIP[evo.status].type}>
+          {EVO_STATUS_CHIP[evo.status].label}
+        </StatusChip>
       </div>
       <div style={{ marginBottom: 18 }}>
         <label style={{ fontSize: 12, fontWeight: 600, color: EVCORE_COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>New status</label>
@@ -150,7 +151,9 @@ function ChangeStatusModal({ evo, onClose }: { evo: EvoAccount | null; onClose: 
         {nextStatus && (
           <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 12, color: EVCORE_COLORS.textSecondary }}>Will become:</span>
-            <EvoStatusChip status={nextStatus as EvoStatus} size="sm" />
+            <StatusChip type={EVO_STATUS_CHIP[nextStatus].type}>
+              {EVO_STATUS_CHIP[nextStatus].label}
+            </StatusChip>
           </div>
         )}
       </div>
@@ -192,7 +195,9 @@ function AssignAssetModal({ evo, onClose }: { evo: EvoAccount | null; onClose: (
             {evo.emcName}
           </div>
         </div>
-        <EvoStatusChip status={evo.status} size="sm" />
+        <StatusChip type={EVO_STATUS_CHIP[evo.status].type}>
+          {EVO_STATUS_CHIP[evo.status].label}
+        </StatusChip>
       </div>
       <div style={{ borderRadius: 8, padding: "12px 14px", marginBottom: 18, backgroundColor: eligible ? "#EBF8F3" : "#FEF9EE", border: `0.5px solid ${eligible ? EVCORE_COLORS.greenLight : EVCORE_COLORS.amber}`, fontSize: 13, color: eligible ? "#0F6E56" : "#854F0B", display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>{eligible ? "✓" : "⚠"}</span>
