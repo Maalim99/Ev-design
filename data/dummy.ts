@@ -783,3 +783,61 @@ export const OSP_TASKS: OspTask[] = [
   { id: "osp-15", evoCode: "EVO-1019", evoName: "Daniel Mukendi",     emcName: "Katanga EMC",   emcCode: "EMC-KAT-001", evProductCode: "ALTECH-F3-2B",   taskStatus: "CERTIFIED",        assignedTrainer: "Grégoire Kabamba", trainingDate: "2025-07-01", trainingLocation: "EMC Katanga — Salle A",       writtenScore: 96, onroadScore: 88, passed: true,  certifiedAt: "2025-07-01", createdAt: "2025-06-24", writtenBreakdown: [{ label: "Road Safety",       awarded: 29, max: 30 }, { label: "Customer Service", awarded: 20, max: 20 }, { label: "Environmental", awarded: 19, max: 20 }, { label: "Payment", awarded: 28, max: 30 }], onroadBreakdown: [{ label: "Technical", awarded: 18, max: 20 }, { label: "Driving", awarded: 9,  max: 10 }, { label: "Safety", awarded: 61, max: 70 }] },
   { id: "osp-16", evoCode: "EVO-1020", evoName: "Rebecca Tshomba",    emcName: "Nord-Kivu",     emcCode: "EMC-GOM-001", evProductCode: "ALTECH-ECAT-A1", taskStatus: "CERTIFIED",        assignedTrainer: "Ambroise Kabong",  trainingDate: "2026-02-28", trainingLocation: "EMC Goma — Salle A",          writtenScore: 77, onroadScore: 70, passed: true,  certifiedAt: "2026-02-28", createdAt: "2026-02-21", writtenBreakdown: [{ label: "Road Safety",       awarded: 23, max: 30 }, { label: "Customer Service", awarded: 16, max: 20 }, { label: "Environmental", awarded: 15, max: 20 }, { label: "Payment", awarded: 23, max: 30 }], onroadBreakdown: [{ label: "Technical", awarded: 14, max: 20 }, { label: "Driving", awarded: 7,  max: 10 }, { label: "Safety", awarded: 49, max: 70 }] },
 ];
+
+// ─── Market Data ──────────────────────────────────────────────────────────────
+
+export interface MarketCountry {
+  id: string;
+  name: string;
+  frenchName: string;
+  acronym: string;
+  numberOfZones: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MarketZone {
+  id: string;
+  name: string;
+  country: string;
+  numberOfCities: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MarketCity {
+  id: string;
+  name: string;
+  zone: string;
+  country: string;
+  numberOfEmcs: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MarketTab = "country" | "zone" | "city" | "emc";
+
+export const MARKET_COUNTRIES: MarketCountry[] = [
+  { id: "c1", name: "Democratic Republic of Congo", frenchName: "République Démocratique du Congo", acronym: "DRC", numberOfZones: 4, createdAt: "2025-01-01", updatedAt: "2026-01-15" },
+  { id: "c2", name: "Rwanda",   frenchName: "Rwanda",   acronym: "RWA", numberOfZones: 1, createdAt: "2025-06-01", updatedAt: "2025-06-01" },
+  { id: "c3", name: "Uganda",   frenchName: "Ouganda",  acronym: "UGA", numberOfZones: 0, createdAt: "2025-08-01", updatedAt: "2025-08-01" },
+  { id: "c4", name: "Burundi",  frenchName: "Burundi",  acronym: "BDI", numberOfZones: 0, createdAt: "2025-10-01", updatedAt: "2025-10-01" },
+  { id: "c5", name: "Tanzania", frenchName: "Tanzanie", acronym: "TZA", numberOfZones: 0, createdAt: "2025-11-01", updatedAt: "2025-11-01" },
+];
+
+export const MARKET_ZONES: MarketZone[] = [
+  { id: "z1", name: "Kinshasa",  country: "DRC", numberOfCities: 2, createdAt: "2025-01-01", updatedAt: "2026-01-15" },
+  { id: "z2", name: "Katanga",   country: "DRC", numberOfCities: 1, createdAt: "2025-01-01", updatedAt: "2025-11-01" },
+  { id: "z3", name: "Nord-Kivu", country: "DRC", numberOfCities: 1, createdAt: "2025-01-01", updatedAt: "2025-12-01" },
+  { id: "z4", name: "Sud-Kivu",  country: "DRC", numberOfCities: 1, createdAt: "2025-03-01", updatedAt: "2025-03-01" },
+  { id: "z5", name: "Kigali",    country: "RWA", numberOfCities: 1, createdAt: "2025-06-01", updatedAt: "2025-06-01" },
+];
+
+export const MARKET_CITIES: MarketCity[] = [
+  { id: "ci1", name: "Kinshasa",    zone: "Kinshasa",  country: "DRC", numberOfEmcs: 2, createdAt: "2025-01-01", updatedAt: "2026-01-15" },
+  { id: "ci2", name: "Brazzaville", zone: "Kinshasa",  country: "DRC", numberOfEmcs: 0, createdAt: "2025-02-01", updatedAt: "2025-02-01" },
+  { id: "ci3", name: "Lubumbashi",  zone: "Katanga",   country: "DRC", numberOfEmcs: 1, createdAt: "2025-01-01", updatedAt: "2025-11-01" },
+  { id: "ci4", name: "Goma",        zone: "Nord-Kivu", country: "DRC", numberOfEmcs: 1, createdAt: "2025-01-01", updatedAt: "2025-12-01" },
+  { id: "ci5", name: "Bukavu",      zone: "Sud-Kivu",  country: "DRC", numberOfEmcs: 0, createdAt: "2025-03-01", updatedAt: "2025-03-01" },
+  { id: "ci6", name: "Kigali",      zone: "Kigali",    country: "RWA", numberOfEmcs: 0, createdAt: "2025-06-01", updatedAt: "2025-06-01" },
+];

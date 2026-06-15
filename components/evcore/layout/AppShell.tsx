@@ -16,6 +16,7 @@ const NAV: NavItem[] = [
   { label: "Analytics",    href: "/" },
   { label: "Accounts",     href: "/accounts" },
   { label: "EMC Centers",  href: "/emcs" },
+  { label: "Markets",      href: "/markets" },
   { label: "Payments",     href: "/payments" },
   { label: "Pay Plans",    href: "/plans" },
   { label: "Products",     href: "/products" },
