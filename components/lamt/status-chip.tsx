@@ -31,7 +31,7 @@ const statusChipVariants = cva(
     "text-white uppercase",
     "rounded-[22px]",
     "text-[11px] leading-4",
-    "font-ubuntu"
+    "font-semibold"
   ),
   {
     variants: {
