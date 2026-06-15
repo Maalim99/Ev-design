@@ -232,10 +232,10 @@ export default function EvoDetailPage() {
             {/* Quick actions row — LAMT buttons with context */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Account" onClick={() => setEditOpen(true)}>Edit Details</Button>
-              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Account" onClick={() => setChangeStatusOpen(true)}>Change Status</Button>
-              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Asset" onClick={() => setAssignAssetOpen(true)}>Assign Asset</Button>
-              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Payments" onClick={() => setRecordPaymentOpen(true)} disabled={!["ACTIVE", "PENDING_RP", "PARTIAL_RP"].includes(evo.status)}>Record Payment</Button>
-              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Account" onClick={() => setDeleteOpen(true)}>Delete Account</Button>
+              <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Account" onClick={() => setChangeStatusOpen(true)}>Change Status</Button>
+              <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Asset" onClick={() => setAssignAssetOpen(true)}>Assign Asset</Button>
+              <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Payments" onClick={() => setRecordPaymentOpen(true)} disabled={!["ACTIVE", "PENDING_RP", "PARTIAL_RP"].includes(evo.status)}>Record Payment</Button>
+              <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Account" onClick={() => setDeleteOpen(true)}>Delete Account</Button>
             </div>
           </div>
 
