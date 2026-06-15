@@ -7,6 +7,8 @@ import { AppShell }    from "@/components/evcore/layout/AppShell";
 import { LabeledItem } from "@/components/lamt/labeled-item";
 import { StatusChip, StatusChipType } from "@/components/lamt/status-chip";
 import { Table, TableCellType, PaginationStrategy } from "@/components/lamt/table";
+import { Button, ButtonKind, ButtonSize } from "@/components/lamt/button";
+import { Modal } from "@/components/lamt/modal";
 import { EditEvoModal }       from "@/components/evcore/modals/EditEvoModal";
 import { DeleteConfirmModal } from "@/components/evcore/ui/EvoDetailModal";
 import {
@@ -65,29 +67,6 @@ function fmtDate(s: string | null | undefined) {
   return new Date(s).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// ─── Primitives matching LAMT design ─────────────────────────────────────────
-
-function QuickAction({ label, context, onClick, disabled, primary }: { label: string; context: string; onClick?: () => void; disabled?: boolean; primary?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        padding: "8px 20px", borderRadius: 99,
-        border: `1.5px solid ${EVCORE_COLORS.green}`,
-        backgroundColor: primary ? EVCORE_COLORS.green : EVCORE_COLORS.white,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.4 : 1,
-        gap: 2,
-        transition: "background-color 0.15s",
-      }}
-    >
-      <span style={{ fontSize: 13, fontWeight: 600, color: primary ? "#fff" : EVCORE_COLORS.green, whiteSpace: "nowrap" }}>{label}</span>
-      <span style={{ fontSize: 10, color: primary ? "rgba(255,255,255,0.75)" : EVCORE_COLORS.green, opacity: 0.8 }}>{context}</span>
-    </button>
-  );
-}
 
 // Box matches LAMT's DetailBoxInner — 7px radius, 1px border, 15px padding
 function Box({ title, chip, actions, children }: {
@@ -189,9 +168,12 @@ export default function EvoDetailPage() {
 
   const evo = EVO_ACCOUNTS.find(e => e.id === id || e.evoCode === id) ?? null;
 
-  const [editOpen,   setEditOpen]   = React.useState(false);
-  const [deleteOpen, setDeleteOpen] = React.useState(false);
-  const [payPage,    setPayPage]    = React.useState(1);
+  const [editOpen,          setEditOpen]          = React.useState(false);
+  const [deleteOpen,        setDeleteOpen]        = React.useState(false);
+  const [assignAssetOpen,   setAssignAssetOpen]   = React.useState(false);
+  const [changeStatusOpen,  setChangeStatusOpen]  = React.useState(false);
+  const [recordPaymentOpen, setRecordPaymentOpen] = React.useState(false);
+  const [payPage,           setPayPage]           = React.useState(1);
 
   React.useEffect(() => { if (!evo) router.push("/accounts"); }, [evo]);
   if (!evo) return null;
@@ -247,13 +229,13 @@ export default function EvoDetailPage() {
               <div style={{ fontSize: 13, color: EVCORE_COLORS.textSecondary }}>{evo.fullName} · {evo.emcName} · {evo.assignedAarove}</div>
             </div>
 
-            {/* Quick actions row — LAMT pill style */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              <QuickAction label="Edit Details"   context="Account"  onClick={() => setEditOpen(true)} primary />
-              <QuickAction label="Change Status"  context="Account" />
-              <QuickAction label="Assign Asset"   context="Asset" />
-              <QuickAction label="Record Payment" context="Payments" disabled={!["ACTIVE", "PENDING_RP", "PARTIAL_RP"].includes(evo.status)} />
-              <QuickAction label="Delete Account" context="Account"  onClick={() => setDeleteOpen(true)} />
+            {/* Quick actions row — LAMT buttons with context */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <Button kind={ButtonKind.Primary} size={ButtonSize.Medium} context="Account" onClick={() => setEditOpen(true)}>Edit Details</Button>
+              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Account" onClick={() => setChangeStatusOpen(true)}>Change Status</Button>
+              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Asset" onClick={() => setAssignAssetOpen(true)}>Assign Asset</Button>
+              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Payments" onClick={() => setRecordPaymentOpen(true)} disabled={!["ACTIVE", "PENDING_RP", "PARTIAL_RP"].includes(evo.status)}>Record Payment</Button>
+              <Button kind={ButtonKind.Normal} size={ButtonSize.Medium} context="Account" onClick={() => setDeleteOpen(true)}>Delete Account</Button>
             </div>
           </div>
 
@@ -276,8 +258,8 @@ export default function EvoDetailPage() {
                 title="Account"
                 chip={<StatusChip type={statusChip.type}>{statusChip.label}</StatusChip>}
                 actions={[
-                  { label: "Change Status",  onClick: () => {} },
-                  { label: "Assign Asset",   onClick: () => {} },
+                  { label: "Change Status",  onClick: () => setChangeStatusOpen(true) },
+                  { label: "Assign Asset",   onClick: () => setAssignAssetOpen(true) },
                   { label: "Delete Account", onClick: () => setDeleteOpen(true) },
                 ]}
               >
@@ -417,6 +399,78 @@ export default function EvoDetailPage() {
       </AppShell>
 
       <EditEvoModal evo={editOpen ? evo : null} onClose={() => setEditOpen(false)} />
+
+      <Modal title="Change Account Status" opened={changeStatusOpen} onClose={() => setChangeStatusOpen(false)}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Update status for {evo.fullName} ({evo.evoCode})</p>
+          <div>
+            <label className="block text-sm font-semibold mb-2">New Status</label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option>ACTIVE</option>
+              <option>PENDING_BGC</option>
+              <option>PENDING_OSP</option>
+              <option>PENDING_RP</option>
+              <option>PARTIAL_RP</option>
+              <option>PENDING_HO</option>
+              <option>INACTIVE</option>
+              <option>DISENGAGED</option>
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end pt-4">
+            <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={() => setChangeStatusOpen(false)}>Cancel</Button>
+            <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={() => setChangeStatusOpen(false)}>Update Status</Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal title="Assign Asset" opened={assignAssetOpen} onClose={() => setAssignAssetOpen(false)}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Assign EV asset to {evo.fullName} via VCU handover</p>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Select Asset</label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option>-- Choose available asset --</option>
+              <option>A-001 (Two-Wheeler, On Road)</option>
+              <option>A-002 (Two-Wheeler, Off Road)</option>
+              <option>A-003 (Three-Wheeler, Off Road)</option>
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end pt-4">
+            <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={() => setAssignAssetOpen(false)}>Cancel</Button>
+            <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={() => setAssignAssetOpen(false)}>Assign Asset</Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal title="Record Payment" opened={recordPaymentOpen} onClose={() => setRecordPaymentOpen(false)}>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Record new payment for {evo.fullName}</p>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Amount (USD)</label>
+            <input type="number" placeholder="0.00" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Payment Channel</label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option>MPESA</option>
+              <option>AIRTEL_MONEY</option>
+              <option>ORANGE_MONEY</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Payment Type</label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option>RENTAL</option>
+              <option>SUBSCRIPTION</option>
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end pt-4">
+            <Button kind={ButtonKind.Ghost} size={ButtonSize.Small} onClick={() => setRecordPaymentOpen(false)}>Cancel</Button>
+            <Button kind={ButtonKind.Primary} size={ButtonSize.Small} onClick={() => setRecordPaymentOpen(false)}>Record Payment</Button>
+          </div>
+        </div>
+      </Modal>
+
       {deleteOpen && (
         <DeleteConfirmModal
           evo={evo}
